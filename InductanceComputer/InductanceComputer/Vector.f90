@@ -60,7 +60,7 @@
         this%xyzw(1) = x
         this%xyzw(2) = y
         this%xyzw(3) = z
-        this%xyzw(4) = 1
+        this%xyzw(4) = 0
     end function init_vector_three
     
     type(vector) function init_vector_four(x, y, z, w) result(this)
@@ -151,9 +151,7 @@
     type(vector) function vector_normalize(this)
         implicit none
         class(vector), intent(in) :: this
-        real length
-        length = vector_length(this)
-        vector_normalize = 1.0 / length * this
+        vector_normalize = 1.0 / this.length() * this
     end function vector_normalize
     
     ! q の共役 q*
@@ -181,7 +179,7 @@
         vector_join = vector_cross(lhs.normalize(), rhs.normalize())
     end function vector_join
     
-    ! 回転, q x v
+    ! 回転, p は実部がゼロなので回転してもベクトルに戻る
     type(vector) function vector_rotate(lhs, rhs)
         implicit none
         class(vector), intent(in) :: lhs, rhs
@@ -191,4 +189,5 @@
         vector_rotate = vector_rotate.cross(rhs)    ! q^-1 p
         vector_rotate = vector_rotate.cross(temp)   ! q^-1 p q
     end function vector_rotate
+    
     end module VectorClass
