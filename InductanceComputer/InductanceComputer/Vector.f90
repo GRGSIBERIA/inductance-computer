@@ -12,11 +12,12 @@
         procedure :: conj => vector_conjugate
         procedure :: reciprocal => vector_reciprocal
         procedure :: rotate => vector_rotate
+        procedure :: show => vector_show
     end type vector
     
     ! コンストラクタの宣言
     interface vector
-        module procedure init_vector_zero, init_vector_three, init_vector_four, init_vector
+        module procedure init_vector_zero, init_vector, init_vector_scalar, init_vector_three, init_vector_four
     end interface vector
     
     ! 演算子オーバーロード
@@ -53,6 +54,12 @@
             this%xyzw(i) = rhs%xyzw(i)
         END DO
     end function init_vector
+    
+    type(vector) function init_vector_scalar(x) result(this)
+        implicit none
+        real, intent(in) :: x
+        this = vector(x, x, x)
+    end function init_vector_scalar
     
     type(vector) function init_vector_three(x, y, z) result(this)
         implicit none
@@ -189,5 +196,11 @@
         vector_rotate = vector_rotate.cross(rhs)    ! q^-1 p
         vector_rotate = vector_rotate.cross(temp)   ! q^-1 p q
     end function vector_rotate
+    
+    subroutine vector_show(this)
+        implicit none
+        class(vector), intent(in) :: this
+        print *, this%xyzw(1), this%xyzw(2), this%xyzw(3), this%xyzw(4)
+    end subroutine vector_show
     
     end module VectorClass
