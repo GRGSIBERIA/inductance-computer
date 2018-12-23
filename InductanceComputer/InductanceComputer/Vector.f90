@@ -174,6 +174,7 @@
         vector_rotate = vector_rotate.cross(temp)   ! q^-1 p q
     end function vector_rotate
     
+    ! ベクトルの中身を表示
     subroutine vector_show(this)
         implicit none
         class(vector), intent(in) :: this
