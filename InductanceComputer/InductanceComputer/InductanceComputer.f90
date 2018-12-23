@@ -18,10 +18,8 @@
     type(vector) a, b, c
     a = vector(3)
     b = vector(1)
-    c = vector(5)
-    ! 変数
-    c%xyzw = (/ 1.0, 2.0, 3.0, 4.0 /)
-    c = c.conj()
+    c = vector((/ 1.0, 2.0, 3.0, 4.0 /))
+    c = c.reciprocal()
 
     ! InductanceComputer の本文
     print *, 'Hello World'
