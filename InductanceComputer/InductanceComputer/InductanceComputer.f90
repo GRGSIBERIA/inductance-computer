@@ -15,13 +15,17 @@
     program InductanceComputer
     USE VectorClass
     implicit none
-    type(vector) v
-    v = vector(3)
+    type(vector) a, b, c
+    a = vector(3)
+    b = vector(1)
+    c = vector(5)
     ! 変数
 
     ! InductanceComputer の本文
     print *, 'Hello World'
-    CALL v.show()
+    CALL a.show()
+    CALL b.show()
+    CALL c.show()
 
     end program InductanceComputer
 

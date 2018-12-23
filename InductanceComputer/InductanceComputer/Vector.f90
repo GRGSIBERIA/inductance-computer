@@ -16,9 +16,6 @@
     end type vector
     
     ! コンストラクタの宣言
-    interface vector
-        module procedure init_vector_zero, init_vector, init_vector_scalar, init_vector_three, init_vector_four
-    end interface vector
     
     ! 演算子オーバーロード
     public operator (+)
@@ -33,51 +30,11 @@
     
     public operator (*)
     interface operator (*)
-        module procedure vector_mul_vr, vector_mul_rv
+        module procedure vector_mul_vr_real, vector_mul_rv_real, vector_mul_vr_int, vector_mul_rv_int
     end interface
     
     ! 関数の実装と宣言
     contains
-    type(vector) function init_vector_zero() result(this)
-        implicit none
-        integer i
-        DO i = 1, 4
-            this%xyzw(i) = 0.0
-        END DO
-    end function init_vector_zero
-    
-    type(vector) function init_vector(rhs) result(this)
-        implicit none
-        type(vector), intent(in) :: rhs
-        integer i
-        DO i = 1, 4
-            this%xyzw(i) = rhs%xyzw(i)
-        END DO
-    end function init_vector
-    
-    type(vector) function init_vector_scalar(x) result(this)
-        implicit none
-        real, intent(in) :: x
-        this = vector(x, x, x)
-    end function init_vector_scalar
-    
-    type(vector) function init_vector_three(x, y, z) result(this)
-        implicit none
-        real, intent(in) :: x, y, z
-        this%xyzw(1) = x
-        this%xyzw(2) = y
-        this%xyzw(3) = z
-        this%xyzw(4) = 0
-    end function init_vector_three
-    
-    type(vector) function init_vector_four(x, y, z, w) result(this)
-        implicit none
-        real, intent(in) :: x, y, z, w
-        this%xyzw(1) = x
-        this%xyzw(2) = y
-        this%xyzw(3) = z
-        this%xyzw(4) = w
-    end function init_vector_four
     
     type(vector) function vector_add(lhs, rhs)
         implicit none
@@ -97,25 +54,45 @@
         END DO
     end function vector_sub
     
-    type(vector) function vector_mul_vr(lhs, rhs)
+    type(vector) function vector_mul_vr_real(lhs, rhs)
         implicit none
         type(vector), intent(in) :: lhs
         real, intent(in) :: rhs
         integer i
         DO i = 1, 4
-            vector_mul_vr%xyzw(i) = lhs%xyzw(i) * rhs
+            vector_mul_vr_real%xyzw(i) = lhs%xyzw(i) * rhs
         END DO
-    end function vector_mul_vr
+    end function vector_mul_vr_real
     
-    type(vector) function vector_mul_rv(lhs, rhs)
+    type(vector) function vector_mul_rv_real(lhs, rhs)
         implicit none
         type(vector), intent(in) :: rhs
         real, intent(in) :: lhs
         integer i
         DO i = 1, 3
-            vector_mul_rv%xyzw(i) = lhs * rhs%xyzw(i)
+            vector_mul_rv_real%xyzw(i) = lhs * rhs%xyzw(i)
         END DO
-    end function vector_mul_rv
+    end function vector_mul_rv_real
+    
+    type(vector) function vector_mul_vr_int(lhs, rhs)
+        implicit none
+        type(vector), intent(in) :: lhs
+        integer, intent(in) :: rhs
+        integer i
+        DO i = 1, 4
+            vector_mul_vr_int%xyzw(i) = lhs%xyzw(i) * real(rhs)
+        END DO
+    end function vector_mul_vr_int
+    
+    type(vector) function vector_mul_rv_int(lhs, rhs)
+        implicit none
+        type(vector), intent(in) :: rhs
+        integer, intent(in) :: lhs
+        integer i
+        DO i = 1, 3
+            vector_mul_rv_int%xyzw(i) = real(lhs) * rhs%xyzw(i)
+        END DO
+    end function vector_mul_rv_int
 
     real function vector_dot(lhs, rhs)
         implicit none
