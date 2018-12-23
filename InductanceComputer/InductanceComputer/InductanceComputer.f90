@@ -16,7 +16,7 @@
     USE VectorClass
     implicit none
     type(vector) v
-    v = vector(3, 5, 3, 2)
+    v = vector(3)
     ! 変数
 
     ! InductanceComputer の本文

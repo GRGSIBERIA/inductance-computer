@@ -3,7 +3,7 @@
     
     ! vector型の宣言
     type, public :: vector
-        real xyzw(4)
+        real :: xyzw(4) = (/ 0.0, 0.0, 0.0, 0.0 /)
     contains
         procedure :: dot => vector_dot
         procedure :: cross => vector_cross
