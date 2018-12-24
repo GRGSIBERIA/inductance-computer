@@ -67,6 +67,8 @@
         
         open (FD, file=path, status="old")
         
+        print *, "[" // GetDateTime() // "] ", "Import Coil CSV: ", path
+        
         ! ヘッダ行の読み取り
         read (FD, *) time_count, coil_count
         allocate(coils(time_count, coil_count))
@@ -102,6 +104,8 @@
         stop
         
 200     continue
+        
+        print *, "[" // GetDateTime() // "] ", "Done Import Coil CSV"
         
         deallocate(line_data)
         close (FD)
