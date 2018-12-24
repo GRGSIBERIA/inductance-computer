@@ -1,5 +1,9 @@
-﻿    module CSVManager
+﻿
+    INCLUDE "DateTimeHelper.f90"
+    
+    module CSVManager
     USE ComputeManager
+    USE DateTimeHelper
     implicit none
     
     private CreateArray
@@ -12,17 +16,6 @@
         real CreateArray(n)
         CreateArray = 0
     end function CreateArray
-    
-    ! 現在の時刻を返す関数
-    function GetDateTime()
-        character date*8, time*10, zone*5
-        integer dateTime(8)
-        character GetDateTime*23
-        
-        CALL DATE_AND_TIME(date, time, zone, dateTime)
-        GetDateTime = date(1:4) // "/" // date(5:6) // "/" // date(7:8) // "-" // time(1:2) // ":" // time(3:4) // ":" // time(5:10)
-        
-    end function GetDateTime
     
     ! 点群のCSVファイルを読み込む
     subroutine LoadPointCSV(path)
@@ -40,7 +33,7 @@
         allocate(points(time_count, point_count))   ! ComputeManager.points の初期化
         allocate(line_data(point_count * 3 + 1))    ! 一時変数の領域を確保
         
-        print *, "[" // GetDateTime() // "] ", "Import Point CSV: ", path
+        print *, GetDateTimeB(), "Import Point CSV: ", path
         
         ! データを入力
         DO time_id = 1, time_count
@@ -51,7 +44,7 @@
             END DO
         END DO
         
-        print *, "[" // GetDateTime() // "] ", "Done Import Point CSV"
+        print *, GetDateTimeB(), "Done Import Point CSV"
         
         deallocate(line_data)
         close (FD)
@@ -77,7 +70,7 @@
         ! 点群とコイルの時系列が一致しない
         if (size(times) .ne. time_count) GOTO 100
         
-        print *, "[" // GetDateTime() // "] ", "Import Coil CSV: ", path
+        print *, GetDateTimeB(), "Import Coil CSV: ", path
         
         ! コイルの設定データの読み取り
         DO coil_id = 1, coil_count
@@ -108,7 +101,7 @@
         
 200     continue
         
-        print *, "[" // GetDateTime() // "] ", "Done Import Coil CSV"
+        print *, GetDateTimeB(), "Done Import Coil CSV"
         
         deallocate(line_data)
         close (FD)

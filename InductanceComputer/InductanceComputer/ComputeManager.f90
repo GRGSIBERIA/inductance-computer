@@ -1,5 +1,6 @@
 ﻿    module ComputeManager
     USE VectorClass
+    USE DateTimeHelper
     implicit none
     
     type, public :: point
@@ -26,12 +27,13 @@
     
     contains
     
-    subroutine DisposePointLoader()
+    subroutine DisposeComputeManager()
         implicit none
         deallocate(times)
         deallocate(points)
         deallocate(coils)
         deallocate(coil_infos)
-    end subroutine DisposePointLoader
+        print *, GetDateTimeB(), "Done disposed compute manager"
+    end subroutine DisposeComputeManager
     
     end module ComputeManager

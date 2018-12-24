@@ -25,5 +25,7 @@
     CALL LoadPointCSV("TEST_POINT.CSV")
     CALL LoadCoilCSV("TEST_COIL.CSV")
     
+    CALL DisposeComputeManager()
+    
     end program InductanceComputer
 

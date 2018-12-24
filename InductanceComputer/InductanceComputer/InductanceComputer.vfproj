@@ -27,6 +27,7 @@
 		<Filter Name="ソースファイル" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath=".\ComputeManager.f90"/>
 		<File RelativePath=".\CSVManager.f90"/>
+		<File RelativePath=".\DateTimeHelper.f90"/>
 		<File RelativePath=".\InductanceComputer.f90"/>
 		<File RelativePath=".\Vector.f90"/></Filter>
 		<Filter Name="ヘッダーファイル" Filter="fi;fd"/>
