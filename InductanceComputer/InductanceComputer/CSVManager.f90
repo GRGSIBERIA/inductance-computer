@@ -47,8 +47,7 @@
             read (FD, *), line_data
             times(time_id) = line_data(1)
             DO point_id = 1, point_count
-                points(time_id, point_id) = point()
-                points(time_id, point_id)%position = vector(line_data((point_id-1) * 3 + 2:(point_id-1) * 3 + 4))
+                points(time_id, point_id) = point(vector(line_data((point_id-1) * 3 + 2:(point_id-1) * 3 + 4)), 0)
             END DO
         END DO
         
@@ -67,7 +66,6 @@
         real, allocatable :: line_data(:)
         real info_data(3)
         integer time_id, coil_id, temp
-        integer start, dead
         
         open (FD, file=path, status="old")
         
@@ -98,10 +96,7 @@
             
             DO coil_id = 1, coil_count
                 temp = coil_id - 1  ! 何度も出てくるので一時変数に退避させる
-                coils(time_id, coil_id) = coil()
-                coils(time_id, coil_id)%position = vector(line_data(temp*9+2:temp*9+4))
-                coils(time_id, coil_id)%front = vector(line_data(temp*9+5:temp*9+7))
-                coils(time_id, coil_id)%right = vector(line_data(temp*9+8:temp*9+10))
+                coils(time_id, coil_id) = coil(vector(line_data(temp*9+2:temp*9+4)), vector(line_data(temp*9+5:temp*9+7)), vector(line_data(temp*9+8:temp*9+10)))
             END DO
         END DO
         GOTO 200

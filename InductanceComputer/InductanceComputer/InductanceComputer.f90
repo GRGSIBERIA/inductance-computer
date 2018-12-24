@@ -12,6 +12,10 @@
 !
 !****************************************************************************
 
+    INCLUDE "Vector.f90"
+    INCLUDE "ComputeManager.f90"
+    INCLUDE "CSVManager.f90"
+    
     program InductanceComputer
     USE VectorClass
     USE CSVManager
