@@ -14,18 +14,10 @@
 
     program InductanceComputer
     USE VectorClass
+    USE CSVManager
     implicit none
-    type(vector) a, b, c
-    a = vector(3)
-    b = vector(1)
-    c = vector((/ 1.0, 2.0, 3.0, 4.0 /))
-    c = c.reciprocal()
-
-    ! InductanceComputer の本文
-    print *, 'Hello World'
-    CALL a.show()
-    CALL b.show()
-    CALL c.show()
-
+    
+    print *, "hello"
+    
     end program InductanceComputer
 
