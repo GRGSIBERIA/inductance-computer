@@ -18,6 +18,7 @@
     implicit none
     
     print *, "hello"
+    CALL LoadPointCSV("TEST.CSV")
     
     end program InductanceComputer
 
