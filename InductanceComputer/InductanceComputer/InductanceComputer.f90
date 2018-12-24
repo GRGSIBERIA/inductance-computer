@@ -18,7 +18,8 @@
     implicit none
     
     print *, "hello"
-    CALL LoadPointCSV("TEST.CSV")
+    CALL LoadPointCSV("TEST_POINT.CSV")
+    CALL LoadCoilCSV("TEST_COIL.CSV")
     
     end program InductanceComputer
 
