@@ -6,12 +6,14 @@
     public LoadPointCSV
     
     contains
+    ! 任意の長さの配列を返す関数
     function CreateArray(n)
         integer, intent(in) :: n
         real CreateArray(n)
         CreateArray = 0
     end function CreateArray
     
+    ! 現在の時刻を返す関数
     function GetDateTime()
         character date*8, time*10, zone*5
         integer dateTime(8)
@@ -67,12 +69,15 @@
         
         open (FD, file=path, status="old")
         
-        print *, "[" // GetDateTime() // "] ", "Import Coil CSV: ", path
-        
         ! ヘッダ行の読み取り
         read (FD, *) time_count, coil_count
         allocate(coils(time_count, coil_count))
         allocate(coil_infos(coil_count))
+        
+        ! 点群とコイルの時系列が一致しない
+        if (size(times) .nq. time_count) GOTO 100
+        
+        print *, "[" // GetDateTime() // "] ", "Import Coil CSV: ", path
         
         ! コイルの設定データの読み取り
         DO coil_id = 1, coil_count
