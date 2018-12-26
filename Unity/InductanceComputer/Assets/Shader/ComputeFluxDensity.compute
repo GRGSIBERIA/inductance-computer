@@ -1,0 +1,16 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel ComputeFluxDensityMatrix
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWBuffer<float> ptMatrix;
+
+float sigma_;
+
+[numthreads(8,8,1)]
+void ComputeFluxDensityMatrix (uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+
+	
+}
