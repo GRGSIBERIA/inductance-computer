@@ -332,3 +332,6 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+*.info
+Unity/InductanceComputer/Library/
+Unity/InductanceComputer/Temp/
