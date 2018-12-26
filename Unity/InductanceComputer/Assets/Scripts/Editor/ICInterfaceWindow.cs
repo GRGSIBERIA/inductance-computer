@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class ICInterfaceWindow : EditorWindow
+public class ICInterfaceWindow : ScriptableWizard
 {
-    [MenuItem("Window/Indactance Computer")]
+    [SerializeField]
+    public TextAsset pointCSV;
+
+    [SerializeField]
+    public TextAsset coilCSV;
+
+    [MenuItem("Window/Inductance Computer")]
     static void Open()
     {
-        GetWindow<InterfaceWindow>
+        DisplayWizard<ICInterfaceWindow>("Inductance Computer");
+    }
+
+    private void OnWizardCreate()
+    {
+        var go = new GameObject("Inductance Compute Manager");
     }
 }
