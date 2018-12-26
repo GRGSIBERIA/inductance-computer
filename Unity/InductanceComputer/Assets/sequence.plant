@@ -1,0 +1,47 @@
+@startuml
+
+actor User
+
+User -> InductanceComputeManager: Import
+
+activate InductanceComputeManager
+
+InductanceComputeManager -> CSVManager: Import CSV File
+
+activate CSVManager
+CSVManager -> CoilScript: new CoilScript(coilCSV, radius, sigma, gamma)
+activate CoilScript
+deactivate CoilScript
+
+CSVManager -> PointScript: new PointScript(pointCSV)
+activate PointScript
+deactivate PointScript
+
+CSVManager -> InductanceComputeManager: SetParent(Object)
+deactivate CSVManager
+
+InductanceComputeManager -> User: End
+deactivate InductanceComputeManager
+
+@enduml
+
+@startuml
+
+actor User
+
+User -> InductanceComputeManager: Compute(range)
+
+activate InductanceComputeManager
+
+loop ranged N-1 times
+    InductanceComputeManager -> CoilScript: Compute(point, currentTime, nextTime)
+    CoilScript -> PointScript: Compute(CurrentFluxDensity, NextFluxDensity)
+    PointScript -> InductanceComputer: Compute(CurrentFluxDensity, NextFluxDensity)
+end
+
+InductanceComputer -> InductanceComputeManager: Inductances
+
+InductanceComputeManager -> User: Inductances
+deactivate InductanceComputeManager
+
+@enduml
