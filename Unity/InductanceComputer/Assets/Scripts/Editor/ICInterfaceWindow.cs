@@ -20,5 +20,12 @@ public class ICInterfaceWindow : ScriptableWizard
     private void OnWizardCreate()
     {
         var go = new GameObject("Inductance Compute Manager");
+        var manager = go.AddComponent<InductanceComputeManager>();
+        manager.pointCSV = pointCSV;
+        manager.coilCSV = coilCSV;
+
+        var field = new GameObject("Field");
+        field.transform.parent = go.transform;
+        field.AddComponent<FieldScript>();
     }
 }
