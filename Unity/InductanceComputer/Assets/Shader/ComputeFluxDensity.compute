@@ -1,16 +1,19 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel ComputeFluxDensityMatrix
+#pragma kernel ComputeFluxDensityOfFerromagnetic
+#pragma kernel ComputeAddedFerromagnetic
+#pragma kernel ComputeFerromagnetic
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
-RWStructuredBuffer<float> ptMatrix;
+RWStructuredBuffer<float> ferroMatrixTop;		// number of coil * number of point * 4byte
+RWStructuredBuffer<float> ferroMatrixBottom;	// number of coil * number of point * 4byte
+RWStructuredBuffer<float> ferroMatrixAdded;		// number of coil * number of point * 4byte
+RWStructuredBuffer<float> ferroMagnetics;		// number of point * 4byte
 
-StructuredBuffer<float3> pointPosition;
+StructuredBuffer<float3> pointPosition;	// number of point * 12byte
 
-StructuredBuffer<float3> coilPosition;
-StructuredBuffer<float3> coilFront;
-StructuredBuffer<float3> coilRight;
-StructuredBuffer<float> coilHalfHeight;
+StructuredBuffer<float3> coilPosition;	// number of coil * 12byte
+StructuredBuffer<float3> coilFront;		// number of coil * 12byte
+StructuredBuffer<float3> coilRight;		// number of coil * 12byte
+StructuredBuffer<float> coilHalfHeight;	// number of coil * 4byte
 
 float sigma;
 
@@ -19,9 +22,10 @@ float divRadius;
 int countTheta;
 int countRadius;
 
-int countCoil;
-int countPoint;
+int coilCount;
+int pointCount;
 
+// クォータニオンの回転を実行する
 inline float4 rotation(float4 l, float4 r)
 {
 	return float4(
@@ -32,10 +36,12 @@ inline float4 rotation(float4 l, float4 r)
 		);
 }
 
+// 強磁性体の磁束密度を求める
 // id.x: coilCount
 // id.y: pointCount
-[numthreads(4,128,1)]
-void ComputeFluxDensityMatrix (uint3 id : SV_DispatchThreadID)
+// id.z: top or bottom
+[numthreads(4,128,2)]
+void ComputeFluxDensityOfFerromagnetic (uint3 id : SV_DispatchThreadID)
 {
 	// TODO: insert actual code here!
 	for (int ti = 0; ti < countTheta; ++ti)
@@ -50,7 +56,6 @@ void ComputeFluxDensityMatrix (uint3 id : SV_DispatchThreadID)
 			float dt = ti * divTheta;
 
 			float upper = dr * sigma;
-			float3 under;
 
 			float4 quat = normalize(float4(front.xyz, dt));
 			float4 conj = float4(-quat.xyz, quat.w);
@@ -61,12 +66,39 @@ void ComputeFluxDensityMatrix (uint3 id : SV_DispatchThreadID)
 			result = rotation(normalize(result), conj);
 
 			float height = coilHalfHeight[id.x];
-			float under_top = pow(length(result.xyz * dr + pointPos - coilPos + front * height), 3.0);
-			float under_bottom = pow(length(result.xyz * dr + pointPos - coilPos - front * height), 3.0);
-
-			// コイルの上端と下端に発生する磁束密度を引く
+			float3 inner = result.xyz * dr + pointPos - coilPos;
 			float div = divRadius * divTheta;
-			ptMatrix[countCoil * id.x + id.y] = (upper / under_top * div) - (upper / under_bottom * div);
+			float under;
+
+			if (id.z == 0)
+			{
+				under = pow(length(inner + front * height), 3.0);
+				ferroMatrixTop[coilCount * id.x + id.y] += upper / under * div;
+			}
+			else
+			{
+				under = pow(length(inner - front * height), 3.0);
+				ferroMatrixBottom[coilCount * id.x + id.y] += upper / under * div;
+			}
 		}
+	}
+}
+
+// id.x: coilCount
+// id.y: pointCount
+[numthreads(8, 128, 1)]
+void ComputeAddedFerromagnetic (uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x * coilCount + id.y;
+	ferroMatrixAdded[i] = ferroMatrixTop[i] - ferroMatrixBottom[i];
+}
+
+// id.x: pointCount
+[numthreads(512, 1, 1)]
+void ComputeFerromagnetic (uint3 id : SV_DispatchThreadID)
+{
+	for (int i = 0; i < coilCount; ++i)
+	{
+		ferroMagnetics[id.x] += ferroMatrixAdded[coilCount * i + id.x];
 	}
 }
