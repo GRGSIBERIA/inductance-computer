@@ -9,11 +9,20 @@ RWStructuredBuffer<float> ferroMatrixAdded;		// number of coil * number of point
 RWStructuredBuffer<float> ferroMagnetics;		// number of point * 4byte
 
 StructuredBuffer<float3> pointPosition;	// number of point * 12byte
-
 StructuredBuffer<float3> coilPosition;	// number of coil * 12byte
 StructuredBuffer<float3> coilFront;		// number of coil * 12byte
 StructuredBuffer<float3> coilRight;		// number of coil * 12byte
 StructuredBuffer<float> coilHalfHeight;	// number of coil * 4byte
+
+// actual used memory
+// number of coil * number of point * 3lines * 4byte
+// number of point * 4byte
+// number of point * 12byte
+// number of coil * 3lines * 12byte
+// number of coil * 4byte
+// number of coil = 6
+// number of point = 200
+// 14.4k + 0.8k + 2.4k + 0.216k + 0.024k = 17.84kbyte
 
 float sigma;
 
@@ -84,6 +93,7 @@ void ComputeFluxDensityOfFerromagnetic (uint3 id : SV_DispatchThreadID)
 	}
 }
 
+// ソレノイドコイルの上面と底面の差を求める
 // id.x: coilCount
 // id.y: pointCount
 [numthreads(8, 128, 1)]
@@ -93,6 +103,7 @@ void ComputeAddedFerromagnetic (uint3 id : SV_DispatchThreadID)
 	ferroMatrixAdded[i] = ferroMatrixTop[i] - ferroMatrixBottom[i];
 }
 
+// 結果を強磁性体のポイントごとにプロットする
 // id.x: pointCount
 [numthreads(512, 1, 1)]
 void ComputeFerromagnetic (uint3 id : SV_DispatchThreadID)
