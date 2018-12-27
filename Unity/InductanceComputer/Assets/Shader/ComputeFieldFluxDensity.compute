@@ -1,0 +1,40 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel ComputeFieldFluxDensity
+
+RWStructuredBuffer<float> fieldFluxDensity;
+
+StructuredBuffer<float> ferromagnetics;
+StructuredBuffer<float3> pointPosition;
+StructuredBuffer<float3> coilFront;
+
+float3 fieldSize;
+int3 fieldCount;
+float3 fieldUpDiv;
+float3 fieldRightDiv;
+float3 fieldForwardDiv;
+float gamma;		// 誘導で磁化したときの比例定数
+
+int coilCount;
+int pointCount;
+
+[numthreads(8,8,8)]
+void ComputeFieldFluxDensity(uint3 id : SV_DispatchThreadID)
+{
+	int ID = id.x * fieldCount.y * fieldCount.z + id.y * fieldCount.z + id.z;
+
+	float3 fieldPosition = fieldRightDiv * id.x + fieldUpDiv * id.y + fieldForwardDiv * id.z;
+
+	float total = 0.0;
+
+	for (int ci = 0; ci < coilCount; ++ci)
+	{
+		for (int pi = 0; pi < pointCount; ++pi)
+		{
+			float top = dot(coilFront[ci], (pointPosition[pi] - fieldPosition));
+			float under = pow(length(pointPosition[pi] - fieldPosition), 3.0);
+			total += gamma * ferromagnetics[pi] * (top / under);
+		}
+	}
+
+	fieldFluxDensity[ID] = total;
+}

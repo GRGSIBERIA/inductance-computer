@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\InductanceComputeManager.cs" />
     <Compile Include="Assets\Scripts\PointScript.cs" />
     <None Include="Assets\Shader\ComputeFerromagnetics.compute" />
+    <None Include="Assets\Shader\ComputeFieldFluxDensity.compute" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/EIICHI/Documents/GitHub/inductance-computer/Unity/InductanceComputer/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
