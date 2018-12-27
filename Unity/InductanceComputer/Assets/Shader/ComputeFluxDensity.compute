@@ -3,14 +3,70 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWBuffer<float> ptMatrix;
+RWStructuredBuffer<float> ptMatrix;
 
-float sigma_;
+StructuredBuffer<float3> pointPosition;
 
-[numthreads(8,8,1)]
+StructuredBuffer<float3> coilPosition;
+StructuredBuffer<float3> coilFront;
+StructuredBuffer<float3> coilRight;
+StructuredBuffer<float> coilHalfHeight;
+
+float sigma;
+
+float divTheta;
+float divRadius;
+int countTheta;
+int countRadius;
+
+int countCoil;
+int countPoint;
+
+inline float4 rotation(float4 l, float4 r)
+{
+	return float4(
+		l.w * r.x + l.x * r.w + l.y * r.z - l.z * r.y,
+		l.w * r.y - l.x * r.z + l.y * r.w + l.z * r.x,
+		l.w * r.z + l.x * r.y + l.y * r.x + l.z * r.w,
+		l.w * r.w - l.x * r.x - l.y * r.y - l.z * r.z
+		);
+}
+
+// id.x: coilCount
+// id.y: pointCount
+[numthreads(4,128,1)]
 void ComputeFluxDensityMatrix (uint3 id : SV_DispatchThreadID)
 {
 	// TODO: insert actual code here!
+	for (int ti = 0; ti < countTheta; ++ti)
+	{
+		for (int ri = 0; ri < countRadius; ++ri)
+		{
+			float3 front = coilFront[id.x];
+			float3 pointPos = pointPosition[id.y];
+			float3 coilPos = coilPosition[id.x];
 
-	
+			float dr = ri * divRadius;
+			float dt = ti * divTheta;
+
+			float upper = dr * sigma;
+			float3 under;
+
+			float4 quat = normalize(float4(front.xyz, dt));
+			float4 conj = float4(-quat.xyz, quat.w);
+			float4 right = float4(coilRight[id.x].xyz, 0);
+
+			float4 result;
+			result = rotation(quat, right);
+			result = rotation(normalize(result), conj);
+
+			float height = coilHalfHeight[id.x];
+			float under_top = pow(length(result.xyz * dr + pointPos - coilPos + front * height), 3.0);
+			float under_bottom = pow(length(result.xyz * dr + pointPos - coilPos - front * height), 3.0);
+
+			// コイルの上端と下端に発生する磁束密度を引く
+			float div = divRadius * divTheta;
+			ptMatrix[countCoil * id.x + id.y] = (upper / under_top * div) - (upper / under_bottom * div);
+		}
+	}
 }
