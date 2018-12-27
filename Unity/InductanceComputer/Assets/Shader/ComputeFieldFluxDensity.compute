@@ -5,7 +5,7 @@
 RWStructuredBuffer<float> fieldFluxDensity;
 
 StructuredBuffer<float> previousFieldFluxDensity;
-RWStructuredBuffer<float> gradientMagneticFlux;
+RWStructuredBuffer<float> gradientMagneticFlux;		// 空間で積分するパラメータは掛けてあるので総和を取るだけでいい
 
 StructuredBuffer<float> ferromagnetics;
 StructuredBuffer<float3> pointPosition;
@@ -53,6 +53,6 @@ float deltaTime;
 void ComputeGradientMagneticFlux(uint3 id : SV_DispatchThreadID)
 {
 	int ID = id.x * fieldCount.y * fieldCount.z + id.y * fieldCount.z + id.z;
-
-	gradientMagneticFlux[ID] = (fieldFluxDensity[ID] - previousFieldFluxDensity[ID]) * deltaTime;
+	const float deltaSpace = length(fieldUpDiv + fieldRightDiv + fieldForwardDiv);
+	gradientMagneticFlux[ID] = (fieldFluxDensity[ID] - previousFieldFluxDensity[ID]) * deltaTime * deltaSpace;
 }
