@@ -1,7 +1,11 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel ComputeFieldFluxDensity
+#pragma kernel ComputeGradientMagneticFlux
 
 RWStructuredBuffer<float> fieldFluxDensity;
+
+StructuredBuffer<float> previousFieldFluxDensity;
+RWStructuredBuffer<float> gradientMagneticFlux;
 
 StructuredBuffer<float> ferromagnetics;
 StructuredBuffer<float3> pointPosition;
@@ -17,6 +21,7 @@ float gamma;		// 誘導で磁化したときの比例定数
 int coilCount;
 int pointCount;
 
+// 空間の磁束密度を求める
 [numthreads(8,8,8)]
 void ComputeFieldFluxDensity(uint3 id : SV_DispatchThreadID)
 {
@@ -37,4 +42,17 @@ void ComputeFieldFluxDensity(uint3 id : SV_DispatchThreadID)
 	}
 
 	fieldFluxDensity[ID] = total;
+}
+
+
+
+float deltaTime;
+
+// 磁束勾配を求める
+[numthreads(8, 8, 8)]
+void ComputeGradientMagneticFlux(uint3 id : SV_DispatchThreadID)
+{
+	int ID = id.x * fieldCount.y * fieldCount.z + id.y * fieldCount.z + id.z;
+
+	gradientMagneticFlux[ID] = (fieldFluxDensity[ID] - previousFieldFluxDensity[ID]) * deltaTime;
 }
