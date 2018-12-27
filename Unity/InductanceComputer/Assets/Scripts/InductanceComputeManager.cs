@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class InductanceComputeManager : MonoBehaviour
 {
-    [SerializeField] public TextAsset pointCSV;
-
-    [SerializeField] public TextAsset coilCSV;
-
+    
 	// Use this for initialization
 	void Start () {
 		

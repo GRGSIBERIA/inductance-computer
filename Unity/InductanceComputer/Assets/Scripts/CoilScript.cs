@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class CoilScript : MonoBehaviour {
 
+    [SerializeField] public TextAsset csv;
+    [SerializeField] public int numberOfRadius;
+    [SerializeField] public int numberOfRadians;
+
 	// Use this for initialization
 	void Start () {
 		

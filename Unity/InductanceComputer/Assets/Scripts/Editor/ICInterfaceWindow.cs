@@ -17,15 +17,24 @@ public class ICInterfaceWindow : ScriptableWizard
         DisplayWizard<ICInterfaceWindow>("Inductance Computer");
     }
 
+    private T AddChild<T>(string name, Transform t)
+        where T : Component
+    {
+        var go = new GameObject(name);
+        go.transform.parent = t;
+        return go.AddComponent<T>();
+    }
+
     private void OnWizardCreate()
     {
         var go = new GameObject("Inductance Compute Manager");
         var manager = go.AddComponent<InductanceComputeManager>();
-        manager.pointCSV = pointCSV;
-        manager.coilCSV = coilCSV;
 
-        var field = new GameObject("Field");
-        field.transform.parent = go.transform;
-        field.AddComponent<FieldScript>();
+        var field = AddChild<FieldScript>("field", go.transform);
+        var point = AddChild<PointScript>("point", go.transform);
+        var coil = AddChild<CoilScript>("coil", go.transform);
+
+        point.csv = pointCSV;
+        coil.csv = coilCSV;
     }
 }
