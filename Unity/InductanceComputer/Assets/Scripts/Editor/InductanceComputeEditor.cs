@@ -17,12 +17,16 @@ public class InductanceComputeEditor : Editor
         GUILayout.Label("Import CSV Files", EditorStyles.boldLabel);
         point.csv = EditorGUILayout.ObjectField("Point CSV", point.csv, typeof(TextAsset), true) as TextAsset;
         coil.csv = EditorGUILayout.ObjectField("Coil CSV", coil.csv, typeof(TextAsset), true) as TextAsset;
+        if (GUILayout.Button("Reload"))
+        {
+            coil.LoadCSV();
+        }
 
         EditorGUILayout.Separator();
         GUILayout.Label("Coil Settings", EditorStyles.boldLabel);
 
-        coil.numberOfRadius = EditorGUILayout.IntField("Integrate for Number of Radius", coil.numberOfRadius);
-        coil.numberOfRadians= EditorGUILayout.IntField("Integrate for Number of Radian", coil.numberOfRadians);
+        coil.numberOfPartitionOfRadius = EditorGUILayout.IntField("Integrate for Number of Radius", coil.numberOfPartitionOfRadius);
+        coil.numberOfPartitionOfRadians= EditorGUILayout.IntField("Integrate for Number of Radian", coil.numberOfPartitionOfRadians);
 
         EditorGUILayout.Separator();
         GUILayout.Label("Point Settings", EditorStyles.boldLabel);
