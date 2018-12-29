@@ -14,4 +14,13 @@ public class InductanceComputeManager : MonoBehaviour
 	void Update () {
 		
 	}
+
+    private void OnDrawGizmos()
+    {
+        if (transform.rotation != Quaternion.identity)
+        {
+            transform.rotation = Quaternion.identity;
+            Debug.LogWarning("Do not rotation");
+        }
+    }
 }

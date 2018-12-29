@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class FieldScript : MonoBehaviour {
 
-    [SerializeField] public Vector3 FieldSize { get; } = new Vector3(0.1f, 0.1f, 0.1f);
+    [SerializeField] public Vector3 FieldSize { get; set; } = new Vector3(0.1f, 0.1f, 0.1f);
 
-    [SerializeField] public Vector3Int NumberOfPartition { get; } = new Vector3Int(200, 200, 200);
+    [SerializeField] public Vector3Int NumberOfPartition { get; set; } = new Vector3Int(200, 200, 200);
 
 	// Use this for initialization
 	void Start () {
@@ -43,5 +43,11 @@ public class FieldScript : MonoBehaviour {
         Gizmos.DrawLine(v[7], v[6]);
         for (int i = 0; i < 4; ++i)
             Gizmos.DrawLine(v[i], v[4 + i]);
+
+        if (transform.rotation != Quaternion.identity)
+        {
+            transform.rotation = Quaternion.identity;
+            Debug.LogWarning("Do not rotation");
+        }
     }
 }

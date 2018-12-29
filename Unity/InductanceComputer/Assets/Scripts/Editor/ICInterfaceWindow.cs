@@ -34,7 +34,7 @@ public class ICInterfaceWindow : ScriptableWizard
         var point = AddChild<PointScript>("point", go.transform);
         var coil = AddChild<CoilScript>("coil", go.transform);
 
-        point.csv = pointCSV;
-        coil.csv = coilCSV;
+        point.CSV = pointCSV;
+        coil.CSV = coilCSV;
     }
 }

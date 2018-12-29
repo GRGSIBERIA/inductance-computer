@@ -5,38 +5,38 @@ using UnityEngine;
 [System.Serializable]
 public struct CoilData
 {
-    public float radius { get; }
-    public Vector3[] positions { get; }
-    public Vector3[] fronts { get; }
-    public Vector3[] rights { get; }
+    [SerializeField] public float Radius { get; }
+    [SerializeField] public Vector3[] Positions { get; }
+    [SerializeField] public Vector3[] Fronts { get; }
+    [SerializeField] public Vector3[] Rights { get; }
     
     public CoilData(float radius, int timeCount)
     {
-        this.positions = new Vector3[timeCount];
-        this.fronts = new Vector3[timeCount];
-        this.rights = new Vector3[timeCount];
-        this.radius = radius;
+        this.Positions = new Vector3[timeCount];
+        this.Fronts = new Vector3[timeCount];
+        this.Rights = new Vector3[timeCount];
+        this.Radius = radius;
     }
 
     public void SetVector(int index, Vector3 position, Vector3 front, Vector3 right)
     {
-        positions[index] = position;
-        fronts[index] = front;
-        rights[index] = right;
+        Positions[index] = position;
+        Fronts[index] = front;
+        Rights[index] = right;
     }
 }
 
 public class CoilScript : MonoBehaviour {
 
-    [SerializeField] public TextAsset csv;
-    [SerializeField] public int numberOfPartitionOfRadius;
-    [SerializeField] public int numberOfPartitionOfRadians;
+    [SerializeField] public TextAsset CSV { get; set; }
+    [SerializeField] public int NumberOfPartitionOfRadius { get; set; }
+    [SerializeField] public int NumberOfPartitionOfRadians { get; set; }
 
-    [SerializeField] public int coilCount;
-    [SerializeField] public int timeCount;
+    [SerializeField] public int CoilCount { get; set; }
+    [SerializeField] public int TimeCount { get; set; }
 
-    [SerializeField] public float[] times;
-    [SerializeField] public CoilData[] coils;
+    [SerializeField] public float[] Times { get; private set; }
+    [SerializeField] public CoilData[] Coils { get; private set; }
 
 	// Use this for initialization
 	void Start () {
@@ -50,10 +50,10 @@ public class CoilScript : MonoBehaviour {
 
     public void LoadCSV()
     {
-        if (csv == null)
+        if (CSV == null)
             throw new System.ArgumentNullException("csv is not set text asset");
 
-        var lines = csv.text.Split('\n');
+        var lines = CSV.text.Split('\n');
         int count = 0;
 
         foreach (var line in lines)
@@ -64,26 +64,26 @@ public class CoilScript : MonoBehaviour {
             if (count == 0)
             {
                 // ヘッダ行の読み込み
-                timeCount = int.Parse(elements[0]);
-                coilCount = int.Parse(elements[1]);
-                times = new float[timeCount];
-                coils = new CoilData[coilCount];
+                TimeCount = int.Parse(elements[0]);
+                CoilCount = int.Parse(elements[1]);
+                Times = new float[TimeCount];
+                Coils = new CoilData[CoilCount];
             }
             else if (count == 1)
             {
                 // コイル情報の読み込み
-                for (int i = 0; i < coils.Length; ++i)
+                for (int i = 0; i < Coils.Length; ++i)
                 {
                     float radius = float.Parse(elements[i]);
-                    coils[i] = new CoilData(radius, timeCount);
+                    Coils[i] = new CoilData(radius, TimeCount);
                 }
             }
             else
             {
                 // 各行の情報を読み取り
-                times[count - 2] = float.Parse(elements[0]);
+                Times[count - 2] = float.Parse(elements[0]);
 
-                for (int i = 0; i < coils.Length; ++i)
+                for (int i = 0; i < Coils.Length; ++i)
                 {
                     Vector3 position = new Vector3(
                         float.Parse(elements[i * 9 + 1]),
@@ -100,7 +100,7 @@ public class CoilScript : MonoBehaviour {
                         float.Parse(elements[i * 9 + 8]),
                         float.Parse(elements[i * 9 + 9])
                         );
-                    coils[i].SetVector(count - 2, position, front, right);
+                    Coils[i].SetVector(count - 2, position, front, right);
                 }
             }
             ++count;

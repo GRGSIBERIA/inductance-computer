@@ -15,30 +15,36 @@ public class InductanceComputeEditor : Editor
         var field = manager.GetComponentInChildren<FieldScript>();
 
         GUILayout.Label("Import CSV Files", EditorStyles.boldLabel);
-        point.csv = EditorGUILayout.ObjectField("Point CSV", point.csv, typeof(TextAsset), true) as TextAsset;
-        coil.csv = EditorGUILayout.ObjectField("Coil CSV", coil.csv, typeof(TextAsset), true) as TextAsset;
+        point.CSV = EditorGUILayout.ObjectField("Point CSV", point.CSV, typeof(TextAsset), true) as TextAsset;
+        coil.CSV = EditorGUILayout.ObjectField("Coil CSV", coil.CSV, typeof(TextAsset), true) as TextAsset;
         if (GUILayout.Button("Reload"))
         {
             coil.LoadCSV();
         }
 
         EditorGUILayout.Separator();
-        GUILayout.Label("Coil Settings", EditorStyles.boldLabel);
+        GUILayout.Label("Coil Settings", EditorStyles.boldLabel, GUILayout.ExpandWidth(false), GUILayout.Width(32));
 
-        coil.numberOfPartitionOfRadius = EditorGUILayout.IntField("Integrate for Number of Radius", coil.numberOfPartitionOfRadius);
-        coil.numberOfPartitionOfRadians= EditorGUILayout.IntField("Integrate for Number of Radian", coil.numberOfPartitionOfRadians);
+        GUILayout.Label("Integrate for Number of Radius");
+        coil.NumberOfPartitionOfRadius = EditorGUILayout.IntField("", coil.NumberOfPartitionOfRadius);
+        GUILayout.Label("Integrate for Number of Radian");
+        coil.NumberOfPartitionOfRadians= EditorGUILayout.IntField("", coil.NumberOfPartitionOfRadians);
 
         EditorGUILayout.Separator();
         GUILayout.Label("Point Settings", EditorStyles.boldLabel);
 
-        point.gamma = EditorGUILayout.FloatField("Proportional to the Magnetic Susceptibility of the point", point.gamma);
+        GUILayout.Label("Charge Density of the point");
+        point.Sigma = EditorGUILayout.FloatField("", point.Sigma);
+        GUILayout.Label("Proportional to the Magnetic Susceptibility \nof the point");
+        point.Gamma = EditorGUILayout.FloatField("", point.Gamma);
 
         EditorGUILayout.Separator();
         GUILayout.Label("Field Settings", EditorStyles.boldLabel);
 
+        field.FieldSize = EditorGUILayout.Vector3Field("Field Size", field.FieldSize);
+        field.NumberOfPartition = EditorGUILayout.Vector3IntField("Number of Partition", field.NumberOfPartition);
+
         EditorGUILayout.Separator();
         GUILayout.Label("Actual Using Resouces", EditorStyles.boldLabel);
-
-        
     }
 }
