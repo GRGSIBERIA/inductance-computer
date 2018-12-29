@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public struct CoilData
 {
-    [SerializeField] public float radius;
-    [SerializeField] public Vector3[] positions;
-    [SerializeField] public Vector3[] fronts;
-    [SerializeField] public Vector3[] rights;
+    public float radius { get; }
+    public Vector3[] positions { get; }
+    public Vector3[] fronts { get; }
+    public Vector3[] rights { get; }
     
     public CoilData(float radius, int timeCount)
     {
