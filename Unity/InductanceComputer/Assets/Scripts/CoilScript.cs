@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct CoilInformation
+public struct CoilData
 {
     [SerializeField] public float radius;
     [SerializeField] public Vector3[] positions;
     [SerializeField] public Vector3[] fronts;
     [SerializeField] public Vector3[] rights;
     
-    public CoilInformation(float radius, int timeCount)
+    public CoilData(float radius, int timeCount)
     {
         this.positions = new Vector3[timeCount];
         this.fronts = new Vector3[timeCount];
@@ -35,7 +35,7 @@ public class CoilScript : MonoBehaviour {
     [SerializeField] public int timeCount;
 
     [SerializeField] public float[] times;
-    [SerializeField] public CoilInformation[] coilInformations;
+    [SerializeField] public CoilData[] coils;
 
 	// Use this for initialization
 	void Start () {
@@ -66,15 +66,15 @@ public class CoilScript : MonoBehaviour {
                 timeCount = int.Parse(elements[0]);
                 coilCount = int.Parse(elements[1]);
                 times = new float[timeCount];
-                coilInformations = new CoilInformation[coilCount];
+                coils = new CoilData[coilCount];
             }
             else if (count == 1)
             {
                 // コイル情報の読み込み
-                for (int i = 0; i < coilInformations.Length; ++i)
+                for (int i = 0; i < coils.Length; ++i)
                 {
                     float radius = float.Parse(elements[i]);
-                    coilInformations[i] = new CoilInformation(radius, timeCount);
+                    coils[i] = new CoilData(radius, timeCount);
                 }
             }
             else
@@ -82,7 +82,7 @@ public class CoilScript : MonoBehaviour {
                 // 各行の情報を読み取り
                 times[count - 2] = float.Parse(elements[0]);
 
-                for (int i = 0; i < coilInformations.Length; ++i)
+                for (int i = 0; i < coils.Length; ++i)
                 {
                     Vector3 position = new Vector3(
                         float.Parse(elements[i * 9 + 1]),
@@ -99,7 +99,7 @@ public class CoilScript : MonoBehaviour {
                         float.Parse(elements[i * 9 + 8]),
                         float.Parse(elements[i * 9 + 9])
                         );
-                    coilInformations[i].SetVector(count - 2, position, front, right);
+                    coils[i].SetVector(count - 2, position, front, right);
                 }
             }
             ++count;
