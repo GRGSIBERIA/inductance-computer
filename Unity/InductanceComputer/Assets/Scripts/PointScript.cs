@@ -16,6 +16,8 @@ public class PointScript : MonoBehaviour {
 
     [SerializeField] public Vector3[] pointPositions;
 
+    [SerializeField] public Vector3[] fluxDensities;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -44,6 +46,7 @@ public class PointScript : MonoBehaviour {
                 pointCount = int.Parse(elements[1]);
                 times = new float[timeCount];
                 pointPositions = new Vector3[pointCount];
+                fluxDensities = new Vector3[pointCount];
             }
             else
             {
