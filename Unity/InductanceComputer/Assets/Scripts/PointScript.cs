@@ -79,11 +79,24 @@ public class PointScript : MonoBehaviour {
         coilBuffers.SetBuffer(shader, kernel);
 
         ComputeBuffer pointPositions = new ComputeBuffer(PointCount, Marshal.SizeOf(typeof(Vector3)));
+        ComputeBuffer fluxDensity = new ComputeBuffer(PointCount * coil.CoilCount, Marshal.SizeOf(typeof(float)));
 
         // 実行
         shader.Dispatch(kernel, coil.CoilCount, PointCount, 1);
 
         // 結果の受け取り
+        var fluxDensityOfFerromagnetic = new float[PointCount];
+        var FD2D = new float[PointCount * coil.CoilCount];
+        fluxDensity.GetData(FD2D);
+        for (int i = 0; i < PointCount; ++i)
+        {
+            fluxDensityOfFerromagnetic[i] = 0f;
+            for (int j = 0; j < coil.CoilCount; ++j)
+            {
+                fluxDensityOfFerromagnetic[i] += FD2D[j * coil.CoilCount + i];
+            }
+        }
+        // fluxDensityOfFerromagnetic に強磁性体における磁束密度の合算値
 
         // バッファの解放
         coilBuffers.DisposeBuffers();
