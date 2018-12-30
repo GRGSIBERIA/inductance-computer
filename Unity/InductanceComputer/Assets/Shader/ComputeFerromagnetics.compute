@@ -9,10 +9,12 @@ RWStructuredBuffer<float> ferroMatrixAdded;		// number of coil * number of point
 RWStructuredBuffer<float> ferroMagnetics;		// number of point * 4byte
 
 StructuredBuffer<float3> pointPosition;	// number of point * 12byte
+
 StructuredBuffer<float3> coilPosition;	// number of coil * 12byte
 StructuredBuffer<float3> coilFront;		// number of coil * 12byte
 StructuredBuffer<float3> coilRight;		// number of coil * 12byte
 StructuredBuffer<float> coilHalfHeight;	// number of coil * 4byte
+StructuredBuffer<float> coilRadius;		// number of coil * 4byte
 
 // actual used memory
 // number of coil * number of point * 3lines * 4byte
@@ -26,8 +28,6 @@ StructuredBuffer<float> coilHalfHeight;	// number of coil * 4byte
 
 float sigma;
 
-float divTheta;
-float divRadius;
 int countTheta;
 int countRadius;
 
@@ -52,10 +52,14 @@ inline float4 rotation(float4 l, float4 r)
 [numthreads(4,128,2)]
 void ComputeFluxDensityOfFerromagnetic (uint3 id : SV_DispatchThreadID)
 {
+	const float PI = 3.14159265359;
+	const float divRadius = coilRadius[id.x] / countRadius;
+	const float divTheta = 2.0 * PI / countTheta;
+
 	// TODO: insert actual code here!
-	for (int ti = 0; ti < countTheta; ++ti)
+	for (int ti = 0; ti < countTheta; ++ti)	// theta
 	{
-		for (int ri = 0; ri < countRadius; ++ri)
+		for (int ri = 0; ri < countRadius; ++ri)	// radius
 		{
 			float3 front = coilFront[id.x];
 			float3 pointPos = pointPosition[id.y];

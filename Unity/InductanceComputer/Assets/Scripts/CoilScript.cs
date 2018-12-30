@@ -1,28 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 [System.Serializable]
 public struct CoilData
 {
     [SerializeField] public float Radius { get; }
+    [SerializeField] public float Height { get; }
     [SerializeField] public Vector3[] Positions { get; }
     [SerializeField] public Vector3[] Fronts { get; }
     [SerializeField] public Vector3[] Rights { get; }
     
-    public CoilData(float radius, int timeCount)
+    public CoilData(float radius, float height, int timeCount)
     {
         this.Positions = new Vector3[timeCount];
         this.Fronts = new Vector3[timeCount];
         this.Rights = new Vector3[timeCount];
         this.Radius = radius;
+        this.Height = height;
     }
 
-    public void SetVector(int index, Vector3 position, Vector3 front, Vector3 right)
+    public void SetVector(int frame, Vector3 position, Vector3 front, Vector3 right)
     {
-        Positions[index] = position;
-        Fronts[index] = front;
-        Rights[index] = right;
+        Positions[frame] = position;
+        Fronts[frame] = front;
+        Rights[frame] = right;
+    }
+
+    public Vector3 GetPosition(int frame)
+    {
+        return Positions[frame];
+    }
+
+    public Vector3 GetFront(int frame)
+    {
+        return Fronts[frame];
+    }
+
+    public Vector3 GetRight(int frame)
+    {
+        return Rights[frame];
     }
 }
 
@@ -74,8 +92,9 @@ public class CoilScript : MonoBehaviour {
                 // コイル情報の読み込み
                 for (int i = 0; i < Coils.Length; ++i)
                 {
-                    float radius = float.Parse(elements[i]);
-                    Coils[i] = new CoilData(radius, TimeCount);
+                    float radius = float.Parse(elements[i * 2]);
+                    float height = float.Parse(elements[i * 2 + 1]);
+                    Coils[i] = new CoilData(radius, height, TimeCount);
                 }
             }
             else
@@ -106,4 +125,67 @@ public class CoilScript : MonoBehaviour {
             ++count;
         }
     }
+    
+    public CoilBuffers GenerateCoilBuffer(int frame)
+    {
+        var positions = new Vector3[CoilCount];
+        var fronts = new Vector3[CoilCount];
+        var rights = new Vector3[CoilCount];
+        var heights = new float[CoilCount];
+        var radius = new float[CoilCount];
+
+        for (int ci = 0; ci < CoilCount; ++ci)
+        {
+            positions[ci] = Coils[ci].GetPosition(frame);
+            fronts[ci] = Coils[ci].GetFront(frame);
+            rights[ci] = Coils[ci].GetRight(frame);
+            heights[ci] = Coils[ci].Height * 0.5f;
+            radius[ci] = Coils[ci].Radius;
+        }
+
+        return new CoilBuffers(CoilCount, positions, radius, heights, fronts, rights);
+    }
 }
+
+public class CoilBuffers
+{
+    public ComputeBuffer Positions { get; set; }
+    public ComputeBuffer Heights { get; set; }
+    public ComputeBuffer Radius { get; set; }
+    public ComputeBuffer Fronts { get; set; }
+    public ComputeBuffer Rights { get; set; }
+
+    public CoilBuffers(int coilCount, Vector3[] positions, float[] radius, float[] heights, Vector3[] fronts, Vector3[] rights)
+    {
+        Positions = new ComputeBuffer(coilCount, Marshal.SizeOf(typeof(Vector3)));
+        Heights = new ComputeBuffer(coilCount, Marshal.SizeOf(typeof(float)));
+        Radius = new ComputeBuffer(coilCount, Marshal.SizeOf(typeof(float)));
+        Fronts = new ComputeBuffer(coilCount, Marshal.SizeOf(typeof(Vector3)));
+        Rights = new ComputeBuffer(coilCount, Marshal.SizeOf(typeof(Vector3)));
+
+        Positions.SetData(positions);
+        Radius.SetData(radius);
+        Heights.SetData(heights);
+        Fronts.SetData(fronts);
+        Rights.SetData(rights);
+    }
+
+    public void SetBuffer(ComputeShader shader, int kernel)
+    {
+        shader.SetBuffer(kernel, "coilPosition", Positions);
+        shader.SetBuffer(kernel, "coilRight", Rights);
+        shader.SetBuffer(kernel, "coilFront", Fronts);
+        shader.SetBuffer(kernel, "coilRadius", Radius);
+        shader.SetBuffer(kernel, "coilHalfHeight", Heights);
+    }
+
+    public void DisposeBuffers()
+    {
+        Positions.Dispose();
+        Rights.Dispose();
+        Fronts.Dispose();
+        Radius.Dispose();
+        Heights.Dispose();
+    }
+}
+

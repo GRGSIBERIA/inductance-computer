@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
+
 
 public class PointScript : MonoBehaviour {
 
@@ -18,7 +20,9 @@ public class PointScript : MonoBehaviour {
 
     [SerializeField] public Vector3[] PointPositions { get; private set; }
 
-    [SerializeField] public Vector3[] FluxDensities { get; private set; }
+    [SerializeField] public float[] FluxDensities { get; private set; }
+
+    [SerializeField] public ComputeShader shader;
 
 	// Use this for initialization
 	void Start () {
@@ -48,7 +52,7 @@ public class PointScript : MonoBehaviour {
                 PointCount = int.Parse(elements[1]);
                 Times = new float[TimeCount];
                 PointPositions = new Vector3[PointCount];
-                FluxDensities = new Vector3[PointCount];
+                FluxDensities = new float[PointCount];
             }
             else
             {
@@ -64,5 +68,24 @@ public class PointScript : MonoBehaviour {
 
             ++count;
         }
+    }
+
+    public void Compute(CoilScript coil, int frame)
+    {
+        int kernel = shader.FindKernel("ComputeFluxDensityOfFerromagnetic");
+
+        // データの入力
+        CoilBuffers coilBuffers = coil.GenerateCoilBuffer(frame);
+        coilBuffers.SetBuffer(shader, kernel);
+
+        ComputeBuffer pointPositions = new ComputeBuffer(PointCount, Marshal.SizeOf(typeof(Vector3)));
+
+        // 実行
+        shader.Dispatch(kernel, coil.CoilCount, PointCount, 1);
+
+        // 結果の受け取り
+
+        // バッファの解放
+        coilBuffers.DisposeBuffers();
     }
 }

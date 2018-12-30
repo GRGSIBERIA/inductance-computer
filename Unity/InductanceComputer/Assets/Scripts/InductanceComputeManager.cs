@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class InductanceComputeManager : MonoBehaviour
 {
-    [SerializeField] public int StartFrame { get; set; }
+    [SerializeField] public int StartFrame { get; set; } = 0;
 
-    [SerializeField] public int EndFrame { get; set; }
+    [SerializeField] public int EndFrame { get; set; } = 0;
 
     [SerializeField] public string SaveFolder { get; set; }
 
