@@ -8,6 +8,8 @@ public class InductanceComputeManager : MonoBehaviour
 
     [SerializeField] public int EndFrame { get; set; }
 
+    [SerializeField] public string SaveFolder { get; set; }
+
 	// Use this for initialization
 	void Start () {
 		

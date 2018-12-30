@@ -28,9 +28,9 @@ public class ICInterfaceWindow : ScriptableWizard
     private void OnWizardCreate()
     {
         var go = new GameObject("Inductance Compute Manager");
-        var manager = go.AddComponent<InductanceComputeManager>();
+        go.AddComponent<InductanceComputeManager>();
 
-        var field = AddChild<FieldScript>("field", go.transform);
+        AddChild<FieldScript>("field", go.transform);
         var point = AddChild<PointScript>("point", go.transform);
         var coil = AddChild<CoilScript>("coil", go.transform);
 

@@ -60,6 +60,15 @@ public class InductanceComputeEditor : Editor
         manager.EndFrame = ValidateUnder(manager.EndFrame, 0);
         manager.EndFrame = ValidateOver(manager.EndFrame, coil.TimeCount);
 
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Save Folder");
+        if (GUILayout.Button("Open"))
+        {
+            manager.SaveFolder = EditorUtility.SaveFolderPanel("Save Folder", manager.SaveFolder, "Assets");
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.Label(manager.SaveFolder);
+
         Separator();
         GUILayout.Label("Actual Using Resouces", EditorStyles.boldLabel);
 
@@ -73,7 +82,20 @@ public class InductanceComputeEditor : Editor
 
         if (GUILayout.Button("Yes, I finished. Start Computing."))
         {
-
+            float calculateFrameCount = (float)(manager.EndFrame - manager.StartFrame);
+            try
+            {
+                for (int frame = manager.StartFrame; frame < manager.EndFrame; ++frame)
+                {
+                    float percentage = (float)(frame - manager.EndFrame) / calculateFrameCount;
+                    EditorUtility.DisplayProgressBar("Computing Inductance", string.Format("{0:#.##} %", percentage * 100f), percentage);
+                }
+            }
+            finally
+            {
+                // IDisposableが実装されていない
+                EditorUtility.ClearProgressBar();
+            }
         }
     }
 
