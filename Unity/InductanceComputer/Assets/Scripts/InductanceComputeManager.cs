@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class InductanceComputeManager : MonoBehaviour
 {
-    
+    [SerializeField] public int StartFrame { get; set; }
+
+    [SerializeField] public int EndFrame { get; set; }
+
 	// Use this for initialization
 	void Start () {
 		

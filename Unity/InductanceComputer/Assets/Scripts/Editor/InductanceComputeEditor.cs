@@ -22,29 +22,103 @@ public class InductanceComputeEditor : Editor
             coil.LoadCSV();
         }
 
-        EditorGUILayout.Separator();
+        Separator();
         GUILayout.Label("Coil Settings", EditorStyles.boldLabel, GUILayout.ExpandWidth(false), GUILayout.Width(32));
 
-        GUILayout.Label("Integrate for Number of Radius");
+        GUILayout.Label("Number of Partition of Radius for Integration");
         coil.NumberOfPartitionOfRadius = EditorGUILayout.IntField("", coil.NumberOfPartitionOfRadius);
-        GUILayout.Label("Integrate for Number of Radian");
-        coil.NumberOfPartitionOfRadians= EditorGUILayout.IntField("", coil.NumberOfPartitionOfRadians);
+        coil.NumberOfPartitionOfRadius = ValidateUnder(coil.NumberOfPartitionOfRadius, 0);
+        GUILayout.Label("Number of Partition of Radian for Integration");
+        coil.NumberOfPartitionOfRadians = EditorGUILayout.IntField("", coil.NumberOfPartitionOfRadians);
+        coil.NumberOfPartitionOfRadians = ValidateUnder(coil.NumberOfPartitionOfRadians, 0);
 
-        EditorGUILayout.Separator();
+        Separator();
         GUILayout.Label("Point Settings", EditorStyles.boldLabel);
 
         GUILayout.Label("Charge Density of the point");
         point.Sigma = EditorGUILayout.FloatField("", point.Sigma);
+        point.Sigma = point.Sigma < 0f ? 0.0000000001f : point.Sigma;
         GUILayout.Label("Proportional to the Magnetic Susceptibility \nof the point");
         point.Gamma = EditorGUILayout.FloatField("", point.Gamma);
+        point.Gamma = point.Gamma < 0f ? 0.0000000001f : point.Gamma;
 
-        EditorGUILayout.Separator();
+        Separator();
         GUILayout.Label("Field Settings", EditorStyles.boldLabel);
 
         field.FieldSize = EditorGUILayout.Vector3Field("Field Size", field.FieldSize);
+        field.FieldSize = SizeCheck(field.FieldSize);
         field.NumberOfPartition = EditorGUILayout.Vector3IntField("Number of Partition", field.NumberOfPartition);
+        field.NumberOfPartition = SizeCheck(field.NumberOfPartition);
 
-        EditorGUILayout.Separator();
+        Separator();
+        GUILayout.Label("Generic Settings", EditorStyles.boldLabel);
+        Information<int>("Total Frame", coil.TimeCount, "frames");
+        manager.StartFrame = EditorGUILayout.IntField("Start Frame", manager.StartFrame);
+        manager.StartFrame = ValidateUnder(manager.StartFrame, 0);
+        manager.StartFrame = ValidateOver(manager.StartFrame, manager.EndFrame);
+        manager.EndFrame = EditorGUILayout.IntField("End Frame", manager.EndFrame);
+        manager.EndFrame = ValidateUnder(manager.EndFrame, 0);
+        manager.EndFrame = ValidateOver(manager.EndFrame, coil.TimeCount);
+
+        Separator();
         GUILayout.Label("Actual Using Resouces", EditorStyles.boldLabel);
+
+        if (GUILayout.Button("Calculate"))
+        {
+
+        }
+
+        Separator();
+        GUILayout.Label("Did you finished settings?", EditorStyles.boldLabel);
+
+        if (GUILayout.Button("Yes, I finished. Start Computing."))
+        {
+
+        }
+    }
+
+    void Information<T>(string title, T amount, string unit)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(title);
+        GUILayout.Label(string.Format("{0}", amount));
+        GUILayout.Label(unit);
+        GUILayout.EndHorizontal();
+    }
+
+    int ValidateUnder(int x, int val)
+    {
+        return x < val ? val : x;
+    }
+
+    int ValidateOver(int x, int top)
+    {
+        return x < top ? x : top;
+    }
+
+    Vector3 SizeCheck(Vector3 target)
+    {
+        Vector3 size = new Vector3();
+        const float under = 0.000000001f;
+        size.x = target.x < 0f ? under : target.x;
+        size.y = target.y < 0f ? under : target.y;
+        size.z = target.z < 0f ? under : target.z;
+        return size;
+    }
+
+    Vector3Int SizeCheck(Vector3Int target)
+    {
+        Vector3Int size = new Vector3Int();
+        const int under = 1;
+        size.x = target.x < 1 ? under : target.x;
+        size.y = target.y < 1 ? under : target.y;
+        size.z = target.z < 1 ? under : target.z;
+        return size;
+    }
+
+    void Separator()
+    {
+        GUILayout.Space(8);
+        GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
     }
 }

@@ -29,8 +29,8 @@ public struct CoilData
 public class CoilScript : MonoBehaviour {
 
     [SerializeField] public TextAsset CSV { get; set; }
-    [SerializeField] public int NumberOfPartitionOfRadius { get; set; }
-    [SerializeField] public int NumberOfPartitionOfRadians { get; set; }
+    [SerializeField] public int NumberOfPartitionOfRadius { get; set; } = 100;
+    [SerializeField] public int NumberOfPartitionOfRadians { get; set; } = 360;
 
     [SerializeField] public int CoilCount { get; set; }
     [SerializeField] public int TimeCount { get; set; }
