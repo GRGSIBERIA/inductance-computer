@@ -89,6 +89,8 @@ public class InductanceComputeEditor : Editor
                 {
                     float percentage = (float)(frame - manager.EndFrame) / calculateFrameCount;
                     EditorUtility.DisplayProgressBar("Computing Inductance", string.Format("{0:#.##} %", percentage * 100f), percentage);
+
+                    var fluxDensityOnPoint = point.Compute(coil, frame);
                 }
             }
             finally

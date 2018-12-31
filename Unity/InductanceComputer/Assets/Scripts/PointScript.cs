@@ -72,7 +72,7 @@ public class PointScript : MonoBehaviour {
         }
     }
 
-    public void Compute(CoilScript coil, int frame)
+    public float[] Compute(CoilScript coil, int frame)
     {
         int cfdfKernel = shader.FindKernel("ComputeFluxDensityOfFerromagnetic");
         int addedKernel = shader.FindKernel("ComputeAddedFerromagnetic");
@@ -95,6 +95,8 @@ public class PointScript : MonoBehaviour {
 
         // バッファの解放
         coilBuffers.Dispose();
+
+        return FluxDensities;
     }
 
     public PointBuffers GeneratePointBuffer(int frame, int coilCount)
