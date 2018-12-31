@@ -91,6 +91,7 @@ public class PointScript : MonoBehaviour {
         shader.Dispatch(ferroKernel, PointCount, 1, 1);
 
         // 結果の受け取り
+        pointBuffers.Ferromagnetics.GetData(FluxDensities);
 
         // バッファの解放
         coilBuffers.Dispose();
