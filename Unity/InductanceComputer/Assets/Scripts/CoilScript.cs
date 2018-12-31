@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -147,7 +148,7 @@ public class CoilScript : MonoBehaviour {
     }
 }
 
-public class CoilBuffers
+public class CoilBuffers : IDisposable
 {
     public ComputeBuffer Positions { get; set; }
     public ComputeBuffer Heights { get; set; }
@@ -179,13 +180,18 @@ public class CoilBuffers
         shader.SetBuffer(kernel, "coilHalfHeight", Heights);
     }
 
-    public void DisposeBuffers()
+    public void Dispose()
     {
         Positions.Dispose();
         Rights.Dispose();
         Fronts.Dispose();
         Radius.Dispose();
         Heights.Dispose();
+    }
+
+    ~CoilBuffers()
+    {
+        Dispose();
     }
 }
 
