@@ -24,6 +24,16 @@ public class PointScript : MonoBehaviour {
     [SerializeField] public float[] FluxDensities { get; private set; }
 
     [SerializeField] public ComputeShader shader;
+    
+    public int UsingThreads(CoilScript coil)
+    {
+        return coil.CoilCount * PointCount;
+    }
+
+    public int UsingMemory(CoilScript coil)
+    {
+        return UsingThreads(coil) * 4 * 3 + PointCount * 4 * 4 + UsingThreads(coil) * 11 * 4;
+    }
 
 	// Use this for initialization
 	void Start () {

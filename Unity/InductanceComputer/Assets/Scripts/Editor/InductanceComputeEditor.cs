@@ -52,7 +52,7 @@ public class InductanceComputeEditor : Editor
 
         Separator();
         GUILayout.Label("Generic Settings", EditorStyles.boldLabel);
-        Information<int>("Total Frame", coil.TimeCount, "frames");
+        PrintHorizontalLabel("Total Frame", coil.TimeCount, "frames");
         manager.StartFrame = EditorGUILayout.IntField("Start Frame", manager.StartFrame);
         manager.StartFrame = ValidateUnder(manager.StartFrame, 0);
         manager.StartFrame = ValidateOver(manager.StartFrame, manager.EndFrame);
@@ -72,10 +72,11 @@ public class InductanceComputeEditor : Editor
         Separator();
         GUILayout.Label("Actual Using Resouces", EditorStyles.boldLabel);
 
-        if (GUILayout.Button("Calculate"))
-        {
+        GUILayout.Label("Phase of Integration \nfor the Point Flux Density");
+        PrintHorizontalLabel("Maximum GPU Threads", point.UsingThreads(coil), "threads");
+        PrintHorizontalLabel("Using Memory Resources", point.UsingMemory(coil), "bytes");
 
-        }
+        GUILayout.Label("Phase of Integration \nfor the Inductance in a Space");
 
         Separator();
         GUILayout.Label("Did you finished settings?", EditorStyles.boldLabel);
@@ -101,12 +102,11 @@ public class InductanceComputeEditor : Editor
         }
     }
 
-    void Information<T>(string title, T amount, string unit)
+    void PrintHorizontalLabel(string title, int val, string unit)
     {
         GUILayout.BeginHorizontal();
         GUILayout.Label(title);
-        GUILayout.Label(string.Format("{0}", amount));
-        GUILayout.Label(unit);
+        GUILayout.Label(string.Format("{0:#,0} " + unit, val));
         GUILayout.EndHorizontal();
     }
 
