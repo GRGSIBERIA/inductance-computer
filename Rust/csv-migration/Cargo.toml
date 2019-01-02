@@ -1,0 +1,7 @@
+[package]
+name = "csv-migration"
+version = "0.1.0"
+authors = ["Eiichi Takebuchi <nanashi4129@gmail.com>"]
+edition = "2018"
+
+[dependencies]
