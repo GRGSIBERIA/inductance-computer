@@ -17,7 +17,7 @@ public class InductanceComputeEditor : Editor
         GUILayout.Label("Import CSV Files", EditorStyles.boldLabel);
         point.CSV = EditorGUILayout.ObjectField("Point CSV", point.CSV, typeof(TextAsset), true) as TextAsset;
         coil.CSV = EditorGUILayout.ObjectField("Coil CSV", coil.CSV, typeof(TextAsset), true) as TextAsset;
-        if (GUILayout.Button("Reload"))
+        if (GUILayout.Button("Load All"))
         {
             coil.LoadCSV();
         }
@@ -84,6 +84,10 @@ public class InductanceComputeEditor : Editor
         if (GUILayout.Button("Yes, I finished. Start Computing."))
         {
             float calculateFrameCount = (float)(manager.EndFrame - manager.StartFrame);
+
+            PointBuffers pointBuffers = point.GeneratePointBuffer(coil.CoilCount);
+            CoilBuffers coilBuffers = coil.GenerateCoilBuffer();
+
             try
             {
                 for (int frame = manager.StartFrame; frame < manager.EndFrame; ++frame)
@@ -91,7 +95,10 @@ public class InductanceComputeEditor : Editor
                     float percentage = (float)(frame - manager.EndFrame) / calculateFrameCount;
                     EditorUtility.DisplayProgressBar("Computing Inductance", string.Format("{0:#.##} %", percentage * 100f), percentage);
 
-                    var fluxDensityOnPoint = point.Compute(coil, frame);
+                    point.SetPointBuffer(frame, pointBuffers);
+                    coil.SetCoilBuffer(frame, coilBuffers);
+
+                    var fluxDensityOnPoint = point.Compute(coilBuffers, pointBuffers, coil.CoilCount, frame);
                 }
             }
             finally
@@ -99,6 +106,9 @@ public class InductanceComputeEditor : Editor
                 // IDisposableが実装されていない
                 EditorUtility.ClearProgressBar();
             }
+            pointBuffers.Dispose();
+            coilBuffers.Dispose();
+
         }
     }
 

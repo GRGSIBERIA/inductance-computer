@@ -82,22 +82,18 @@ public class PointScript : MonoBehaviour {
         }
     }
 
-    public float[] Compute(CoilScript coil, int frame)
+    public float[] Compute(CoilBuffers coilBuffers, PointBuffers pointBuffers, int coilCount, int frame)
     {
         int cfdfKernel = shader.FindKernel("ComputeFluxDensityOfFerromagnetic");
         int addedKernel = shader.FindKernel("ComputeAddedFerromagnetic");
         int ferroKernel = shader.FindKernel("ComputeFerromagnetic");
 
-        // データの入力
-        CoilBuffers coilBuffers = coil.GenerateCoilBuffer(frame);
-        PointBuffers pointBuffers = GeneratePointBuffer(frame, coil.CoilCount);
-
         coilBuffers.SetBuffer(shader, cfdfKernel);
         pointBuffers.SetBuffer(shader, cfdfKernel, addedKernel, ferroKernel);
 
         // 実行
-        shader.Dispatch(cfdfKernel, coil.CoilCount, PointCount, 2);
-        shader.Dispatch(addedKernel, coil.CoilCount, PointCount, 1);
+        shader.Dispatch(cfdfKernel, coilCount, PointCount, 2);
+        shader.Dispatch(addedKernel, coilCount, PointCount, 1);
         shader.Dispatch(ferroKernel, PointCount, 1, 1);
 
         // 結果の受け取り
@@ -109,9 +105,14 @@ public class PointScript : MonoBehaviour {
         return FluxDensities;
     }
 
-    public PointBuffers GeneratePointBuffer(int frame, int coilCount)
+    public void SetPointBuffer(int frame, PointBuffers pointBuffers)
     {
-        return new PointBuffers(PointPositions[frame], coilCount);
+        pointBuffers.SetData(PointPositions[frame]);
+    }
+
+    public PointBuffers GeneratePointBuffer(int coilCount)
+    {
+        return new PointBuffers(coilCount, PointCount);
     }
 }
 
@@ -124,14 +125,17 @@ public class PointBuffers : IDisposable
     public ComputeBuffer FerromagneticAdded { get; private set; }
     public ComputeBuffer Ferromagnetics { get; private set; }
 
-    public PointBuffers(Vector3[] pointPositions, int coilCount)
+    public PointBuffers(int coilCount, int pointCount)
     {
-        PointPositions = new ComputeBuffer(pointPositions.Length, Marshal.SizeOf(typeof(Vector3)));
-        FerromagneticTop = new ComputeBuffer(pointPositions.Length * coilCount, Marshal.SizeOf(typeof(float)));
-        FerromagneticBottom = new ComputeBuffer(pointPositions.Length * coilCount, Marshal.SizeOf(typeof(float)));
-        FerromagneticAdded = new ComputeBuffer(pointPositions.Length * coilCount, Marshal.SizeOf(typeof(float)));
-        Ferromagnetics = new ComputeBuffer(pointPositions.Length, Marshal.SizeOf(typeof(float)));
+        PointPositions = new ComputeBuffer(pointCount, Marshal.SizeOf(typeof(Vector3)));
+        FerromagneticTop = new ComputeBuffer(pointCount * coilCount, Marshal.SizeOf(typeof(float)));
+        FerromagneticBottom = new ComputeBuffer(pointCount * coilCount, Marshal.SizeOf(typeof(float)));
+        FerromagneticAdded = new ComputeBuffer(pointCount * coilCount, Marshal.SizeOf(typeof(float)));
+        Ferromagnetics = new ComputeBuffer(pointCount, Marshal.SizeOf(typeof(float)));
+    }
 
+    public void SetData(Vector3[] pointPositions)
+    {
         PointPositions.SetData(pointPositions);
     }
 
