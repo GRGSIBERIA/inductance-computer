@@ -1,21 +1,22 @@
-use std::str::FromStr;
-use std::fmt::Debug;
+fn read_i32() -> i32 {
+    let mut line = String::new();
+    let scan = std::io::stdin();
+    let _ = scan.read_line(&mut line);
+    let vec: Vec<&str> = line.split_whitespace().collect();
+    let num: i32 = vec[0].parse().unwrap();
+    num
+}
 
-fn read_line<T>() -> Vec<T>
-where T: FromStr, <T as FromStr>::Err : Debug {
-    let mut s = String::new();
-    std::io::stdin().read_line(&mut s).unwrap();
-    s.trim().split_whitespace().map(|c| T::from_str(c).unwrap()).collect()
+struct Data {
+    num_times: i32,
+    num_time_divisions: i32,
+    coil_height: i32,
+    top_of_the_coil: i32,
+    range_start: f32,
+    range_end: f32,
 }
 
 fn main() {
-    
-    let mut s: String = String::new();
-    std::io::stdin().read_line(&mut s).unwrap();
-    let num: i32 = s.parse().unwrap();
-
-    println!("{}", num);
-
     println!("Number of times:");
 
     println!("Number of time division:");
@@ -24,5 +25,7 @@ fn main() {
 
     println!("Wire's position of top of the coil:");
 
-    println!("Range of horizontal movement of wire:");
+    println!("Start of horizontal movement of wire:");
+
+    println!("End of horizontal movement of wire:");
 }
