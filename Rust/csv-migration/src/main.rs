@@ -9,9 +9,7 @@ where T: FromStr, <T as FromStr>::Err : Debug{
 }
 
 fn main() {
-    println!("Hello, world!");
-
-    let mut s = String::new();
-    std::io::stdin().read_line(&mut s).unwrap();
-    
+    let x : Vec<u32> = read_line();
+    let num = x[1];
+    println!("{}", num);
 }
