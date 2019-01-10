@@ -21,6 +21,7 @@ class Coil:
 
 class Wire:
     def __init__(self, position: np.array):
+        """ワイヤのクラス"""
         self.position = position
         self._fluxDensity = 0.
         self._lock = threading.Lock()
@@ -64,7 +65,8 @@ class FluxDensity:
     def _fracDown(self, dtheta: float, dr: float, coilPosition: np.array) -> float:
         q = np.quaternion(dtheta, self.coil.forward[0], self.coil.forward[1], self.coil.forward[2])
         q = 1. / q.absolute() * q
-        return pow(abs(dr * q * self.coil.right + self.wire.position - coilPosition), 3.)
+        v = abs(dr * q * self.coil.right + self.wire.position - coilPosition)
+        return v * v * v
 
     def _integrateBw(self, dtheta: float, dr: float) -> float:
         """ワイヤの磁束密度を求める, 差分計算あり"""
@@ -88,12 +90,14 @@ class Field:
         self.height = height
         self.depth = depth
         self.fluxDensity = np.zeros((width, height, depth), dtype=float)
+        self._computed = False
     
     def Bwz(self, point: np.array, wire: Wire, coil: Coil, coils: List[Coil]) -> float:
         """測定点の磁束密度を計算する"""
         out = coil.gamma * wire.FluxDensity(coils)
         fracUp = np.dot(coil.forward, wire.position - point)
-        fracDown = pow(np.abs(wire.position - point), 3.)
+        downpow = np.abs(wire.position - point)
+        fracDown = downpow * downpow * downpow
         return out * (fracUp / fracDown)
     
     def _GetPoint(self, w: int, h: int, d: int) -> List[np.array]:
@@ -101,9 +105,14 @@ class Field:
 
     def FluxDensity(self, wire: Wire, coils: List[Coil]) -> np.array:
         """空間の磁束密度の計算"""
+        if self._computed:
+            return self.fluxDensity
+        
         for w in range(self.width):
             for h in range(self.height):
                 for d in range(self.depth):
                     point = self._GetPoint(w, h, d)
                     for coil in coils:
                         self.fluxDensity[w][h][d] += self.Bwz(point, wire, coil, coils)
+        self._computed = True
+        return self.fluxDensity
