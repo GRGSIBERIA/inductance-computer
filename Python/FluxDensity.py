@@ -2,14 +2,8 @@
 from typing import List
 import numpy as np
 import quaternion
+import threading
 from scipy.integrate import dblquad
-
-# 測定場のクラス
-class Field:
-    def __init__(self, width, height, depth):
-        self.width = width
-        self.height = height
-        self.depth = depth
 
 # コイルのクラス
 class Coil:
@@ -28,15 +22,31 @@ class Coil:
 class Wire:
     def __init__(self, position: np.array, coils: List[Coil]):
         self.position = position
-        self.fluxDensity = self._computeFluxDensity(coils)
+        self._fluxDensity = 0.
+        self._threads = []
+        self._lock = threading.Lock()
+        self._coils = coils
 
-    def _computeFluxDensity(self, coils: List[Coil]) -> float:
-        fluxDensity = 0.
         for coil in coils:
-            fd = FluxDensity(coil, self)
-            fluxDensity += fd.Bw()
-        return fluxDensity
+            thread = threading.Thread(target=self._computeFluxDensity, args=(coil))
+            self._threads.append(thread)
+            
+    def _computeFluxDensity(self, coil: Coil):
+        fd = FluxDensity(coil, self)
+        flux = fd.Bw()
 
+        self._lock.acquire()
+        self._fluxDensity += flux
+        self._lock.release()
+    
+    def FluxDensity(self):
+        for thread in self._threads:    # まとめて走らせてまとめて受け取る
+            thread.start()
+        for thread in self._threads:
+            thread.join()
+        return self._fluxDensity
+
+# 磁束密度を計算するクラス
 class FluxDensity:
     def __init__(self, coil: Coil, wire: Wire):
         self.coil = coil 
@@ -50,7 +60,7 @@ class FluxDensity:
         q = 1. / q.absolute() * q
         return pow(abs(dr * q * self.coil.right + self.wire.position - coilPosition), 3.)
 
-    # ワイヤの磁束密度を求める
+    # ワイヤの磁束密度を求める, 差分計算あり
     def _integrateBw(self, dtheta: float, dr: float) -> float:
         return \
             self._fracUp(dr) / self._fracDown(dr, dtheta, self.coil.top) - \
@@ -60,12 +70,17 @@ class FluxDensity:
     def Bw(self) -> float:
         return dblquad(self._integrateBw, 0, 2.*np.pi, lambda dr: 0, lambda dr: self.coil.radius)
     
-    # 測定点の磁束密度を計算する
-    def Bwz(self, point: np.array, bw=None) -> float:
-        if bw == None:
-            bw = self.Bw()
-        out = self.coil.gamma * bw
-        fracUp = np.dot(self.coil.forward, self.wire.position - point)
-        fracDown = pow(np.abs(self.wire.position - point), 3.)
-        return out * (fracUp / fracDown)
+# 測定場のクラス
+class Field:
+    def __init__(self, width, height, depth):
+        self.width = width
+        self.height = height
+        self.depth = depth
+        self._data = np.zeros((width, height, depth), dtype=float)
     
+    # 測定点の磁束密度を計算する
+    def Bwz(self, point: np.array, wire: Wire, coil: Coil) -> float:
+        out = coil.gamma * wire.FluxDensity()
+        fracUp = np.dot(coil.forward, wire.position - point)
+        fracDown = pow(np.abs(wire.position - point), 3.)
+        return out * (fracUp / fracDown)
