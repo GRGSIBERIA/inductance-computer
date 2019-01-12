@@ -9,8 +9,8 @@ class Coil:
     def __init__(self, position: np.array, forward: np.array, right: np.array, height: float, radius: float, sigma=1., gamma=1.):
         """コイルのクラス"""
         self.position = position
-        self.forward = forward
-        self.right = right
+        self.forward = forward / np.linalg.norm(forward)
+        self.right = right / np.linalg.norm(right)
         self.height = height
         self.radius = radius
         self.sigma = sigma
@@ -24,33 +24,19 @@ class Wire:
         """ワイヤのクラス"""
         self.position = position
         self._fluxDensity = 0.
-        self._lock = threading.Lock()
         self._computed = False
             
     def _computeFluxDensity(self, coil: Coil):
         fd = FluxDensity(coil, self)
-        flux = fd.Bw()
-
-        # 足し算するところでスレッドをブロック
-        self._lock.acquire()
-        self._fluxDensity += flux
-        self._lock.release()
+        self._fluxDensity += fd.Bw()
     
     def FluxDensity(self, coils: List[Coil]) -> float:
         """ワイヤの磁束密度を計算して返す"""
         if self._computed:
             return self._fluxDensity
 
-        threads = []
         for coil in coils:
-            thread = threading.Thread(target=self._computeFluxDensity, args=(coil))
-            threads.append(thread)
-
-        for thread in threads:    # まとめて走らせてまとめて受け取る
-            thread.start()
-        for thread in threads:
-            thread.join()
-        self._computed = True
+            self._computeFluxDensity(coil)
         return self._fluxDensity
 
 class FluxDensity:
@@ -65,7 +51,9 @@ class FluxDensity:
     def _fracDown(self, dtheta: float, dr: float, coilPosition: np.array) -> float:
         q = np.quaternion(dtheta, self.coil.forward[0], self.coil.forward[1], self.coil.forward[2])
         q = 1. / q.absolute() * q
-        v = abs(dr * q * self.coil.right + self.wire.position - coilPosition)
+        q = (dr * q * self.coil.right)[0]
+        v = np.array([q.x, q.y, q.z]) + self.wire.position - coilPosition
+        v = np.linalg.norm(v)
         return v * v * v
 
     def _integrateBw(self, dtheta: float, dr: float) -> float:
@@ -76,15 +64,15 @@ class FluxDensity:
 
     def Bw(self) -> float:
         """ワイヤの磁束密度を計算する"""
-        return dblquad(self._integrateBw, 0, 2.*np.pi, lambda dr: 0, lambda dr: self.coil.radius)
+        return dblquad(self._integrateBw, 0, 2.*np.pi, lambda dr: 0, lambda dr: self.coil.radius)[0]
     
 # 測定場のクラス
 class Field:
     def __init__(self, origin: np.array, forward: np.array, right: np.array, width: float, height: float, depth: float):
         """ 規定場クラス """
         self.origin = origin
-        self.forward = forward
-        self.right = right
+        self.forward = forward / np.linalg.norm(forward)
+        self.right = forward / np.linalg.norm(right)
         self.up = np.cross(self.forward, self.right)
         self.width = width
         self.height = height
@@ -101,7 +89,14 @@ class Field:
         return out * (fracUp / fracDown)
     
     def _GetPoint(self, w: int, h: int, d: int) -> List[np.array]:
+        """w,h,dのインデックスに応じて空間上の座標を取得"""
         return [w * self.right, h * self.up, d * self.forward]
+
+    def _workerThreadForDepth(self, w: int, h: int, wire: Wire, coils: List[Coil]):
+        for d in range(self.depth):
+            point = self._GetPoint(w, h, d)
+            for coil in coils:
+                self.fluxDensity[w][h][d] += self.Bwz(point, wire, coil, coils)
 
     def FluxDensity(self, wire: Wire, coils: List[Coil]) -> np.array:
         """空間の磁束密度の計算"""
@@ -110,9 +105,14 @@ class Field:
         
         for w in range(self.width):
             for h in range(self.height):
-                for d in range(self.depth):
-                    point = self._GetPoint(w, h, d)
-                    for coil in coils:
-                        self.fluxDensity[w][h][d] += self.Bwz(point, wire, coil, coils)
+                thread = threading.Thread(target=self._workerThreadForDepth, args=(w, h, wire, coils))
+                thread.start()      # 効率化のためdepthごとにスレッドを生成する
+
+        # スレッドをjoinして待つ
+        main_thread = threading.current_thread()
+        for thread in threading.enumerate():
+            if thread is main_thread: continue
+            thread.join()
+        
         self._computed = True
         return self.fluxDensity
