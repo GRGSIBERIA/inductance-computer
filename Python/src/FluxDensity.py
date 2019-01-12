@@ -6,15 +6,15 @@ import threading
 from scipy.integrate import dblquad
 
 class Coil:
-    def __init__(self, position: np.array, forward: np.array, right: np.array, height: float, radius: float):
+    def __init__(self, position: np.array, forward: np.array, right: np.array, height: float, radius: float, sigma=1., gamma=1.):
         """コイルのクラス"""
         self.position = position
         self.forward = forward
         self.right = right
         self.height = height
         self.radius = radius
-        self.sigma = 1.
-        self.gamma = 1.
+        self.sigma = sigma
+        self.gamma = gamma
         self.halfHeight = height * 0.5
         self.top = self.position + self.forward * self.halfHeight
         self.bottom = self.position - self.forward * self.halfHeight
