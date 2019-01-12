@@ -68,15 +68,17 @@ class FluxDensity:
     
 # 測定場のクラス
 class Field:
-    def __init__(self, origin: np.array, forward: np.array, right: np.array, width: float, height: float, depth: float):
+    def __init__(self, origin: np.array, forward: np.array, right: np.array, field_size: np.array, field_divisions: np.array):
         """ 規定場クラス """
         self.origin = origin
         self.forward = forward / np.linalg.norm(forward)
         self.right = forward / np.linalg.norm(right)
         self.up = np.cross(self.forward, self.right)
-        self.width = width
-        self.height = height
-        self.depth = depth
+        self.width = field_size[0]      # 説明変数にしておく
+        self.height = field_size[1]
+        self.depth = field_size[2]
+        self.field_divisions = field_size / field_divisions
+
         self.fluxDensity = np.zeros((width, height, depth), dtype=float)
         self._computed = False
     
@@ -84,13 +86,16 @@ class Field:
         """測定点の磁束密度を計算する"""
         out = coil.gamma * wire.FluxDensity(coils)
         fracUp = np.dot(coil.forward, wire.position - point)
-        downpow = np.abs(wire.position - point)
+        downpow = np.linalg.norm(wire.position - point)
         fracDown = downpow * downpow * downpow
         return out * (fracUp / fracDown)
     
     def _GetPoint(self, w: int, h: int, d: int) -> List[np.array]:
         """w,h,dのインデックスに応じて空間上の座標を取得"""
-        return [w * self.right, h * self.up, d * self.forward]
+        return [\
+            w * self.right * self.field_divisions[0], \
+            h * self.up * self.field_divisions[1], \
+            d * self.forward * self.field_divisions[2]]
 
     def _workerThreadForDepth(self, w: int, h: int, wire: Wire, coils: List[Coil]):
         for d in range(self.depth):
