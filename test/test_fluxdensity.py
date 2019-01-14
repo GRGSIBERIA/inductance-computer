@@ -6,6 +6,8 @@ class WiredFluxDensityTest(unittest.TestCase):
     def test_wire(self):
         wire = Wire(np.array([0, 0, 5]))
         coils = self.make_zero_position_one_coil()
+        self.assertNotEqual(wire, None)
+        self.assertNotEqual(coils, None)
     
     def make_wire_positions(self):
         arr = []
