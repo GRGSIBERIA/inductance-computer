@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 from src.FluxDensity import Coil, Wire
+import matplotlib.pyplot as plot
 
 class WiredFluxDensityTest(unittest.TestCase):
     def test_wire(self):
@@ -9,18 +10,29 @@ class WiredFluxDensityTest(unittest.TestCase):
         self.assertNotEqual(wire, None)
         self.assertNotEqual(coils, None)
     
-    def make_wire_positions(self):
+    def make_wire_positions(self, z):
         arr = []
         for i in range(201):
             arr.append(0.5 * i - 50)
-        return arr
+        return [Wire(np.array([x, 0, z])) for x in arr]
     
     def make_zero_position_one_coil(self):
-        return [Coil(np.array([0, 0, 0]), np.array([0., 0., 1.]), np.array([1., 0., 0.]), 1, 1)]
+        return [Coil(np.array([0, 0, -0.5]), np.array([0., 0., 1.]), np.array([1., 0., 0.]), 1, 1)]
         
     def test_positions(self):
-        a = self.make_wire_positions()
-        wires = [Wire(np.array([x, 0, 5])) for x in a]
+        wires = self.make_wire_positions(5)
         coils = self.make_zero_position_one_coil()
+        x = [w.position[0] for w in wires]
+        fluxes = []
         for wire in wires:
-            wire.FluxDensity(coils)
+            fluxes.append(wire.FluxDensity(coils))
+        fluxes = np.array(fluxes) / np.max(fluxes)
+        var = np.std(fluxes)
+        print("var: %f" % (var))
+
+        #plot.plot(x, fluxes)
+        #plot.xlim(-10, 10)
+        #plot.show()
+    
+    def test_field_point(self):
+        pass

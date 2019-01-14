@@ -50,8 +50,8 @@ class FluxDensity:
     
     def _fracDown(self, dtheta: float, dr: float, coilPosition: np.array) -> float:
         q = np.quaternion(dtheta, self.coil.forward[0], self.coil.forward[1], self.coil.forward[2])
-        q = 1. / q.absolute() * q
-        q = (dr * q * self.coil.right)[0]
+        #q = 1. / q.absolute() * q  # 自動的にq^-1 v qを解決するのかわからない
+        q = (dr * (q * self.coil.right))[0]
         v = np.array([q.x, q.y, q.z]) + self.wire.position - coilPosition
         v = np.linalg.norm(v)
         return v * v * v
@@ -79,7 +79,7 @@ class Field:
         self.depth = field_size[2]
         self.field_divisions = field_size / field_divisions
 
-        self.fluxDensity = np.zeros((width, height, depth), dtype=float)
+        self.fluxDensity = np.zeros((self.width, self.height, self.depth), dtype=float)
         self._computed = False
     
     def Bwz(self, point: np.array, wire: Wire, coil: Coil, coils: List[Coil]) -> float:
