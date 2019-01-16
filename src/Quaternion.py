@@ -2,21 +2,36 @@ import numpy as np
 
 class Quaternion:
     def __init__(self, r: float, v: np.array):
-        self._v = v
-        self._r = r
+        self.v = v
+        self.r = r
     
     def conj(self):
-        self._v = -self._v
+        self.v = -self.v
         return self
     
     def norm(self):
+        total = self.distance()
+        self.v = self.v / total
+        self.r = self.r / total
+        return self
+    
+    def distance(self):
         total = 0.
         for i in range(3):
-            total += self._v[i] * self._v[i]
-        total += self._r * self._r
-        self._v = self._v / total
-        self._r = self._r / total
-    
+            total += self.v[i] * self.v[i]
+        total += self.r * self.r
+        return np.sqrt(total)
+
     def inverse(self):
-        pass
-        
+        return self.conj()
+    
+    def __mul__(self, q):
+        return Quaternion(self.r * q.r - np.dot(self.v, q.v), self.r * q.v + q.r * self.v + np.cross(self.v, q.v))
+
+    def rotation(self, p: np.array, theta: float):
+        cos = np.cos(theta * 0.5)
+        sin = np.sin(theta * 0.5)
+        P = Quaternion(0, p)
+        Q = Quaternion(cos, self.v * sin)
+        R = Quaternion(cos, -self.v * sin)
+        return (Q * P * R).v

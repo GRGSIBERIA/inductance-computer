@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from src.FluxDensity import Coil, Wire
 import matplotlib.pyplot as plot
-import quaternion
+from src.Quaternion import Quaternion
 
 class WiredFluxDensityTest(unittest.TestCase):
 
@@ -32,7 +32,7 @@ class WiredFluxDensityTest(unittest.TestCase):
         var = np.std(fluxes)
         print("var: %f" % (var))
 
-        debug = False
+        debug = True
         if debug:
             plot.plot(x, fluxes)
             plot.xlim(-10, 10)
@@ -44,6 +44,14 @@ class WiredFluxDensityTest(unittest.TestCase):
     def test_quaternion(self):
         x = np.array([1,0,0])
         z = np.array([0,0,1])
-        q = np.quaternion(2.*np.pi, z[0], z[1], z[2])
-        a = (q * x * ((1./q.norm().conjugate()) * q))[0]
-        print(a)
+
+        q = Quaternion(0, z)
+        v = q.rotation(x, np.pi)
+        
+        np.testing.assert_almost_equal(v, np.array([-1., 0., 0.]))
+
+        v = q.rotation(x, np.pi/2.)
+        np.testing.assert_almost_equal(v, np.array([0., 1., 0.]))
+
+        v = q.rotation(x, -np.pi/2.)
+        np.testing.assert_almost_equal(v, np.array([0., -1., 0.]))

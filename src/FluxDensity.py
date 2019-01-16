@@ -1,9 +1,9 @@
 # 作成者：竹渕瑛一
 from typing import List
 import numpy as np
-import quaternion
 import threading
 from scipy.integrate import dblquad
+from src.Quaternion import Quaternion
 
 class Coil:
     def __init__(self, position: np.array, forward: np.array, right: np.array, height: float, radius: float, sigma=1., gamma=1.):
@@ -49,10 +49,8 @@ class FluxDensity:
         return self.coil.sigma * r
     
     def _fracDown(self, dtheta: float, dr: float, coilPosition: np.array) -> float:
-        q = np.quaternion(dtheta, self.coil.forward[0], self.coil.forward[1], self.coil.forward[2])
-        #q = 1. / q.absolute() * q  # 自動的にq^-1 v qを解決するのかわからない
-        q = (dr * (q * self.coil.right))[0]
-        v = np.array([q.x, q.y, q.z]) + self.wire.position - coilPosition
+        q = Quaternion(0, self.coil.forward)
+        v = q.rotation(self.coil.right, dtheta) * dr + self.wire.position - coilPosition
         v = np.linalg.norm(v)
         return v * v * v
 
@@ -116,7 +114,8 @@ class Field:
         # スレッドをjoinして待つ
         main_thread = threading.current_thread()
         for thread in threading.enumerate():
-            if thread is main_thread: continue
+            if thread is main_thread:
+                continue
             thread.join()
         
         self._computed = True
