@@ -2,8 +2,10 @@ import unittest
 import numpy as np
 from src.FluxDensity import Coil, Wire
 import matplotlib.pyplot as plot
+import quaternion
 
 class WiredFluxDensityTest(unittest.TestCase):
+
     def test_wire(self):
         wire = Wire(np.array([0, 0, 5]))
         coils = self.make_zero_position_one_coil()
@@ -30,9 +32,18 @@ class WiredFluxDensityTest(unittest.TestCase):
         var = np.std(fluxes)
         print("var: %f" % (var))
 
-        #plot.plot(x, fluxes)
-        #plot.xlim(-10, 10)
-        #plot.show()
+        debug = False
+        if debug:
+            plot.plot(x, fluxes)
+            plot.xlim(-10, 10)
+            plot.show()
     
     def test_field_point(self):
         pass
+    
+    def test_quaternion(self):
+        x = np.array([1,0,0])
+        z = np.array([0,0,1])
+        q = np.quaternion(2.*np.pi, z[0], z[1], z[2])
+        a = (q * x * ((1./q.norm().conjugate()) * q))[0]
+        print(a)
