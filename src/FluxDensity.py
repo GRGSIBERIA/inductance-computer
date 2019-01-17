@@ -84,7 +84,11 @@ class Field:
     def Bwz(self, point: np.array, wire: Wire, coil: Coil, coils: List[Coil]) -> float:
         """測定点の磁束密度を計算する"""
         out = coil.gamma * wire.FluxDensity(coils)
-        fracUp = np.dot(coil.forward, wire.position - point)
+
+        distance = wire.position - point
+        normalized_distance = distance / np.linalg.norm(distance)
+
+        fracUp = np.linalg.norm(np.dot(normalized_distance, coil.forward) * coil.forward)
         downpow = np.linalg.norm(wire.position - point)
         fracDown = downpow * downpow * downpow
         return out * (fracUp / fracDown)
