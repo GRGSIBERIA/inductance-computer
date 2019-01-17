@@ -46,12 +46,12 @@ class WiredFluxDensityTest(unittest.TestCase):
     def test_field_point(self):
         wires = self.make_wire_positions(5)
         coils = self.make_zero_position_one_coil()
-        field = Field(np.array([-50, -50, 0]), np.array([0, 0, 1]), np.array([1, 0, 0]), np.array([100, 100, 100]), np.array([0.5, 0.5, 0.5]))
+        field = Field(np.array([-50, -50, 0]), np.array([0, 0, 1]), np.array([1, 0, 0]), np.array([100, 100, 100]), np.array([10., 10., 10.]))
 
-        i = 0
+        a = field.FluxDensity(wires, coils)
+
         for wire in wires:
-            start = time.time()
-            field.FluxDensity(wire, coils)
-            elapsed = time.time() - start 
-            print("{:0=3} elapsed time: {} [sec]".format(i, elapsed))
-            i += 1
+            wire[0].position[0] = 1.
+        
+        b = field.fluxDensity(wires, coils)
+        print(field.Inductance(a, b, 0.1))

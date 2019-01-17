@@ -1,8 +1,10 @@
 # 作成者：竹渕瑛一
 from typing import List
-import numpy as np
 import threading
-from scipy.integrate import dblquad
+
+import numpy as np
+
+from scipy.integrate import dblquad, tplquad
 from src.Quaternion import Quaternion
 
 class Coil:
@@ -106,23 +108,40 @@ class Field:
             for coil in coils:
                 self.fluxDensity[w][h][d] += self.Bwz(point, wire, coil, coils)
 
-    def FluxDensity(self, wire: Wire, coils: List[Coil]) -> np.array:
+    def FluxDensity(self, wires: List[Wire], coils: List[Coil]) -> np.array:
         """空間の磁束密度の計算"""
         if self._computed:
+            print("compute only one.")
             return self.fluxDensity
-        
-        for w in range(self.num_sizes[0]):
-            for h in range(self.num_sizes[1]):
-                #thread = threading.Thread(target=self._workerThreadForDepth, args=(w, h, wire, coils))
-                #thread.start()      # 効率化のためdepthごとにスレッドを生成する
-                self._workerThreadForDepth(w, h, wire, coils)
 
-        # スレッドをjoinして待つ
-        main_thread = threading.current_thread()
-        for thread in threading.enumerate():
-            if thread is main_thread:
-                continue
-            thread.join()
+        for wire in wires:
+            for w in range(self.num_sizes[0]):
+                import time
+                start = time.time()
+                
+                for h in range(self.num_sizes[1]):
+                    #thread = threading.Thread(target=self._workerThreadForDepth, args=(w, h, wire, coils))
+                    #thread.start()      # 効率化のためdepthごとにスレッドを生成する
+                    self._workerThreadForDepth(w, h, wire, coils)
+
+                # スレッドをjoinして待つ
+                main_thread = threading.current_thread()
+                for thread in threading.enumerate():
+                    if thread is main_thread:
+                        continue
+                    thread.join()
+                
+                print(w, self.num_sizes[1], self.num_sizes[2], time.time() - start, "[sec]")
         
         self._computed = True
         return self.fluxDensity
+    
+    def Inductance(self, a: np.array, b: np.array, delta_time: float):
+        """誘導起電力の計算"""
+        grad_flux = (b - a) / delta_time
+        inductance = 0.
+        for w in range(self.num_sizes[0]):
+            for h in range(self.num_sizes[1]):
+                for d in range(self.num_sizes[2]):
+                    inductance += grad_flux[w][h][d] * (np.linalg.norm(self.field_divisions))
+        return inductance

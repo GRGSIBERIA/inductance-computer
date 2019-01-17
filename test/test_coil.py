@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import quaternion
 from src.FluxDensity import Coil
 
 class TestCoil(unittest.TestCase):
