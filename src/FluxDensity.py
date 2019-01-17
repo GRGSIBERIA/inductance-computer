@@ -26,7 +26,6 @@ class Wire:
         """ワイヤのクラス"""
         self.position = position
         self._fluxDensity = 0.
-        self._computed = False
             
     def _computeFluxDensity(self, coil: Coil):
         fd = FluxDensity(coil, self)
@@ -34,9 +33,6 @@ class Wire:
     
     def FluxDensity(self, coils: List[Coil]) -> float:
         """ワイヤの磁束密度を計算して返す"""
-        if self._computed:
-            return self._fluxDensity
-
         for coil in coils:
             self._computeFluxDensity(coil)
         return self._fluxDensity
@@ -110,10 +106,7 @@ class Field:
 
     def FluxDensity(self, wires: List[Wire], coils: List[Coil]) -> np.array:
         """空間の磁束密度の計算"""
-        if self._computed:
-            print("compute only one.")
-            return self.fluxDensity
-
+        num_w = 0
         for wire in wires:
             for w in range(self.num_sizes[0]):
                 import time
@@ -131,9 +124,9 @@ class Field:
                         continue
                     thread.join()
                 
-                print(w, self.num_sizes[1], self.num_sizes[2], time.time() - start, "[sec]")
+                print(num_w, w, self.num_sizes[1], self.num_sizes[2], time.time() - start, "[sec]")
+            num_w += 1
         
-        self._computed = True
         return self.fluxDensity
     
     def Inductance(self, a: np.array, b: np.array, delta_time: float):

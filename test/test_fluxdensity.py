@@ -19,8 +19,8 @@ class WiredFluxDensityTest(unittest.TestCase):
     
     def make_wire_positions(self, z):
         arr = []
-        for i in range(200):
-            arr.append(0.5 * i - 50)
+        for i in range(20):
+            arr.append(5. * i - 50)
         return [Wire(np.array([x, 0, z])) for x in arr]
     
     def make_zero_position_one_coil(self):
