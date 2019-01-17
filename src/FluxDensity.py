@@ -75,9 +75,10 @@ class Field:
         self.width = field_size[0]      # 説明変数にしておく
         self.height = field_size[1]
         self.depth = field_size[2]
-        self.field_divisions = field_size / field_divisions
-
-        self.fluxDensity = np.zeros((self.width, self.height, self.depth), dtype=float)
+        self.field_divisions = field_divisions
+        self.num_sizes = field_size / field_divisions
+        self.num_sizes = [int(self.num_sizes[0]), int(self.num_sizes[1]), int(self.num_sizes[2])]
+        self.fluxDensity = np.zeros(self.num_sizes, dtype=float)
         self._computed = False
     
     def Bwz(self, point: np.array, wire: Wire, coil: Coil, coils: List[Coil]) -> float:
@@ -88,15 +89,15 @@ class Field:
         fracDown = downpow * downpow * downpow
         return out * (fracUp / fracDown)
     
-    def _GetPoint(self, w: int, h: int, d: int) -> List[np.array]:
+    def _GetPoint(self, w: int, h: int, d: int) -> np.array:
         """w,h,dのインデックスに応じて空間上の座標を取得"""
-        return [\
+        return np.array([\
             w * self.right * self.field_divisions[0], \
             h * self.up * self.field_divisions[1], \
-            d * self.forward * self.field_divisions[2]]
+            d * self.forward * self.field_divisions[2]])
 
     def _workerThreadForDepth(self, w: int, h: int, wire: Wire, coils: List[Coil]):
-        for d in range(self.depth):
+        for d in range(self.num_sizes[2]):
             point = self._GetPoint(w, h, d)
             for coil in coils:
                 self.fluxDensity[w][h][d] += self.Bwz(point, wire, coil, coils)
@@ -106,10 +107,11 @@ class Field:
         if self._computed:
             return self.fluxDensity
         
-        for w in range(self.width):
-            for h in range(self.height):
-                thread = threading.Thread(target=self._workerThreadForDepth, args=(w, h, wire, coils))
-                thread.start()      # 効率化のためdepthごとにスレッドを生成する
+        for w in range(self.num_sizes[0]):
+            for h in range(self.num_sizes[1]):
+                #thread = threading.Thread(target=self._workerThreadForDepth, args=(w, h, wire, coils))
+                #thread.start()      # 効率化のためdepthごとにスレッドを生成する
+                self._workerThreadForDepth(w, h, wire, coils)
 
         # スレッドをjoinして待つ
         main_thread = threading.current_thread()

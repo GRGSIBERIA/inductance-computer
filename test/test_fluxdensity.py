@@ -1,8 +1,13 @@
 import unittest
+import time
 import numpy as np
-from src.FluxDensity import Coil, Wire
 import matplotlib.pyplot as plot
-from src.Quaternion import Quaternion
+import win_unicode_console
+from src.FluxDensity import Coil, Wire
+from src.FluxDensity import Field
+
+
+win_unicode_console.enable()
 
 class WiredFluxDensityTest(unittest.TestCase):
 
@@ -14,7 +19,7 @@ class WiredFluxDensityTest(unittest.TestCase):
     
     def make_wire_positions(self, z):
         arr = []
-        for i in range(201):
+        for i in range(200):
             arr.append(0.5 * i - 50)
         return [Wire(np.array([x, 0, z])) for x in arr]
     
@@ -30,28 +35,23 @@ class WiredFluxDensityTest(unittest.TestCase):
             fluxes.append(wire.FluxDensity(coils))
         fluxes = np.array(fluxes) / np.max(fluxes)
         var = np.std(fluxes)
-        print("var: %f" % (var))
+        #print("var: %f" % (var))
 
-        debug = True
+        debug = False
         if debug:
             plot.plot(x, fluxes)
             plot.xlim(-10, 10)
             plot.show()
     
     def test_field_point(self):
-        pass
-    
-    def test_quaternion(self):
-        x = np.array([1,0,0])
-        z = np.array([0,0,1])
+        wires = self.make_wire_positions(5)
+        coils = self.make_zero_position_one_coil()
+        field = Field(np.array([-50, -50, 0]), np.array([0, 0, 1]), np.array([1, 0, 0]), np.array([100, 100, 100]), np.array([0.5, 0.5, 0.5]))
 
-        q = Quaternion(0, z)
-        v = q.rotation(x, np.pi)
-        
-        np.testing.assert_almost_equal(v, np.array([-1., 0., 0.]))
-
-        v = q.rotation(x, np.pi/2.)
-        np.testing.assert_almost_equal(v, np.array([0., 1., 0.]))
-
-        v = q.rotation(x, -np.pi/2.)
-        np.testing.assert_almost_equal(v, np.array([0., -1., 0.]))
+        i = 0
+        for wire in wires:
+            start = time.time()
+            field.FluxDensity(wire, coils)
+            elapsed = time.time() - start 
+            print("{:0=3} elapsed time: {} [sec]".format(i, elapsed))
+            i += 1
