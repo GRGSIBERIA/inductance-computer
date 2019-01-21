@@ -138,3 +138,4 @@ class Field:
                 for d in range(self.num_sizes[2]):
                     inductance += grad_flux[w][h][d] * (np.linalg.norm(self.field_divisions))
         return inductance
+        
