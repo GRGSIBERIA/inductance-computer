@@ -10,18 +10,11 @@ namespace CudaComputing
 {
     public struct Vector3
     {
-        public double x;
-        public double y;
-        public double z;
+        public double x, y, z;
 
         public Vector3(double x, double y, double z)
         {
             this.x = x; this.y = y; this.z = z;
-        }
-
-        public Vector3(double[] v)
-        {
-            x = v[0]; y = v[1]; z = v[2];
         }
 
         public static Vector3 Zero = new Vector3(0.0, 0.0, 0.0);
@@ -61,11 +54,20 @@ namespace CudaComputing
                 );
         }
 
+        /// <summary>
+        /// ベクトルの内積，内部で正規化はおこなわない　
+        /// </summary>
+        /// <param name="a">ベクトルA</param>
+        /// <param name="b">ベクトルB</param>
+        /// <returns>内積</returns>
         public static double Dot(Vector3 a, Vector3 b)
         {
             return a.x * b.x + a.y * b.y + a.z * b.z;
         }
 
+        /// <summary>
+        /// ベクトルの長さ
+        /// </summary>
         public double Length
         {
             get
@@ -74,6 +76,9 @@ namespace CudaComputing
             }
         }
 
+        /// <summary>
+        /// ベクトルの正規化
+        /// </summary>
         public Vector3 Normalized
         {
             get
@@ -85,21 +90,13 @@ namespace CudaComputing
 
     public struct Quaternion
     {
-        public double x;
-        public double y;
-        public double z;
-        public double w;
+        public double x, y, z, w;
 
+        public static Quaternion Zero = new Quaternion(0.0, 0.0, 0.0, 0.0);
 
         public Quaternion(double x, double y, double z, double w)
         {
-            v = new double[4];
             this.x = x; this.y = y; this.z = z; this.w = w;
-        }
-
-        public Quaternion(double[] v)
-        {
-            x = v[0]; y = v[1]; z = v[2]; w = v[3];
         }
 
         public Quaternion(Vector3 vec, double w)
@@ -107,7 +104,7 @@ namespace CudaComputing
             x = vec.x; y = vec.y; z = vec.z; this.w = w;
         }
 
-        public static Quaternion operator+(Quaternion a, Quaternion b)
+        public static Quaternion operator +(Quaternion a, Quaternion b)
         {
             return new Quaternion(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
         }
@@ -137,6 +134,19 @@ namespace CudaComputing
             return new Vector3(ret.x, ret.y, ret.z);
         }
 
+        public static Quaternion operator *(Quaternion a, double b)
+        {
+            return new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
+        }
+
+        public static Quaternion operator *(double b, Quaternion a)
+        {
+            return new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
+        }
+
+        /// <summary>
+        /// 長さ
+        /// </summary>
         public double Length
         {
             get
@@ -145,6 +155,9 @@ namespace CudaComputing
             }
         }
 
+        /// <summary>
+        /// 正規化
+        /// </summary>
         public Quaternion Normalized
         {
             get
@@ -154,6 +167,9 @@ namespace CudaComputing
             }
         }
 
+        /// <summary>
+        /// 共役クォータニオン
+        /// </summary>
         public Quaternion Conj
         {
             get
@@ -162,6 +178,24 @@ namespace CudaComputing
             }
         }
 
+        /// <summary>
+        /// 逆数クォータニオン
+        /// </summary>
+        public Quaternion Inv
+        {
+            get
+            {
+                double len = this.Length;
+                return (1.0 / (len * len)) * this.Conj;
+            }
+        }
+
+        /// <summary>
+        /// 軸と回転角からクォータニオンを生成する
+        /// </summary>
+        /// <param name="axis">軸</param>
+        /// <param name="angle">回転角</param>
+        /// <returns>軸周りのクォータニオン</returns>
         public static Quaternion AxisAngle(Vector3 axis, double angle)
         {
             return new Quaternion(axis.Normalized, angle);
