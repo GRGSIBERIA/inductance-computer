@@ -85,9 +85,11 @@ namespace AleaTestProject
     [GpuManaged]
     public class AreaCore
     {
+        const int N = 100 * 100 * 100;
+
         public static double[] RunParallel()
         {
-            double[] result = new double[100 * 100 * 100];
+            double[] result = new double[N];
 
             Gpu.Default.For(0, result.Length, n =>
             {
@@ -99,7 +101,7 @@ namespace AleaTestProject
 
         public static double[] RunSquare()
         {
-            double[] result = new double[100 * 100 * 100];
+            double[] result = new double[N];
 
             Gpu.Default.For(0, result.Length, n =>
             {
@@ -111,7 +113,7 @@ namespace AleaTestProject
 
         public static float3[] RunVector()
         {
-            float3[] result = new float3[100 * 100 * 100];
+            float3[] result = new float3[N];
 
             Gpu.Default.For(0, result.Length, n =>
             {
@@ -124,7 +126,7 @@ namespace AleaTestProject
 
         public static double3[] RunDouble3()
         {
-            double3[] result = new double3[100 * 100 * 100];
+            double3[] result = new double3[N];
 
             Gpu.Default.For(0, result.Length, n =>
             {
@@ -136,6 +138,8 @@ namespace AleaTestProject
         }
     }
 
+
+    /*
     public struct double3 : IEquatable<double3>, IStructuralEquatable, IComparable<double3>, IComparable, IStructuralComparable
     {
         public double x, y, z;
@@ -171,4 +175,5 @@ namespace AleaTestProject
             return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
         }
     }
+    */
 }
