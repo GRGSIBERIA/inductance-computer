@@ -92,6 +92,14 @@ namespace CudaComputing
     {
         public double x, y, z, w;
 
+        public Vector3 V
+        {
+            get
+            {
+                return new Vector3(x, y, z);
+            }
+        }
+
         public static Quaternion Zero = new Quaternion(0.0, 0.0, 0.0, 0.0);
 
         public Quaternion(double x, double y, double z, double w)
@@ -116,11 +124,11 @@ namespace CudaComputing
 
         public static Quaternion operator *(Quaternion a, Quaternion b)
         {
-            return new Quaternion(
-                a.y * b.z - a.z * b.y,
-                a.z * b.x - a.x * b.z,
-                a.x * b.y - a.y * b.x,
-                a.w * b.w - (a.x * b.x + a.y * b.y + a.z * b.z));
+            var A = a.V;
+            var B = b.V;
+            var v = a.w * B + A * b.w + A * B;
+
+            return new Quaternion(v, a.w * b.w - Vector3.Dot(A, B));
         }
 
         public static Vector3 operator *(Quaternion Q, Vector3 vec)
