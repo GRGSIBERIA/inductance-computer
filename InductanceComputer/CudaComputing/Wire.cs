@@ -8,21 +8,30 @@ using Alea.Parallel;
 
 namespace CudaComputing
 {
-    [GpuManaged]
     public class Wire
     {
         public Vector3 Position { get; private set; }
-        public float FluxDensity { get; private set; }
+        public double FluxDensity { get; private set; }
 
         public Wire(Vector3 position, Coil[] coils)
         {
             Position = position;
-            FluxDensity = 0f;
+            FluxDensity = 0.0;
         }
 
+        [GpuManaged]
         private void ComputeFluxDensity(Coil[] coils)
         {
+            double[] result = new double[coils.Length];
+            Gpu.Default.For(0, coils.Length, i =>
+            {
+                var v = coils[i].Position + coils[i].Forward;
+                result[i] = v.Length;
+            });
 
+            FluxDensity = 0.0;
+            foreach (var f in result)
+                FluxDensity += f;
         }
     }
     
