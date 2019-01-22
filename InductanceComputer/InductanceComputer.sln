@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CudaComputing", "CudaComput
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AleaTestProject", "AleaTestProject\AleaTestProject.csproj", "{D077175A-2681-46CE-ABD8-AC55A21A4A74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{0659C07A-79B1-4700-B539-A8B2E9422E8F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0659C07A-79B1-4700-B539-A8B2E9422E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0659C07A-79B1-4700-B539-A8B2E9422E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0659C07A-79B1-4700-B539-A8B2E9422E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0659C07A-79B1-4700-B539-A8B2E9422E8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
