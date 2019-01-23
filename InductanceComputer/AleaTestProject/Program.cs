@@ -73,19 +73,41 @@ namespace AleaTestProject
             }
         }
 
+        static void RunQuaternion()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var result = AreaCore.RunQuaternion();
+            watch.Stop();
+
+            Console.WriteLine($"RunQuaternion: {watch.ElapsedMilliseconds} ms");
+
+        }
+
+        static void RunConjugate()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var result = AreaCore.RunConjugate();
+            watch.Stop();
+
+            Console.WriteLine($"RunConjugate: {watch.ElapsedMilliseconds} ms");
+        }
+
         static void Main(string[] args)
         {
             RunParallel();
             RunSquare();
             RunVector();
             RunDouble3();
+            RunConjugate();
         }
     }
 
     [GpuManaged]
     public class AreaCore
     {
-        const int N = 100 * 100 * 100;
+        const int N = 1000000;
 
         public static double[] RunParallel()
         {
@@ -132,6 +154,34 @@ namespace AleaTestProject
             {
                 result[n] = new double3();
                 result[n].x = (double)n;
+            });
+
+            return result;
+        }
+
+        public static double3[] RunQuaternion()
+        {
+            double3[] result = new double3[N];
+            double3 unitX = new double3(1.0, 0.0, 0.0);
+
+            Gpu.Default.For(0, result.Length, n =>
+            {
+                double theta = n * 0.01;
+                var Q = Quaternion.AxisAngle(unitX, theta / Math.PI);
+                result[n] = Q * unitX;
+            });
+
+            return result;
+        }
+
+        public static Quaternion[] RunConjugate()
+        {
+            Quaternion[] result = new Quaternion[N];
+
+            Gpu.Default.For(0, result.Length, n =>
+            {
+                var Q = new Quaternion(1.0, 1.0, 1.0, 0.0);
+                result[n] = Q.Conj;
             });
 
             return result;

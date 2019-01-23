@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
+using Microsoft.FSharp.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -120,6 +122,8 @@ namespace CudaComputing
         }
     }
 
+    [CompilationMapping(SourceConstructFlags.ObjectType)]
+    [Struct]
     public struct Quaternion : IEquatable<Quaternion>, IStructuralEquatable, IComparable<Quaternion>, IComparable, IStructuralComparable
     {
         public double x, y, z, w;
@@ -132,6 +136,7 @@ namespace CudaComputing
             }
         }
 
+        [ReflectedDefinition]
         public Quaternion(double x, double y, double z, double w)
         {
             this.x = x; this.y = y; this.z = z; this.w = w;
@@ -245,7 +250,9 @@ namespace CudaComputing
         {
             get
             {
-                return new Quaternion(-x, -y, -z, w);
+                var Q = new Quaternion();
+                Q.x = -x; Q.y = -y; Q.z = -z; Q.w = w;
+                return Q;
             }
         }
 
