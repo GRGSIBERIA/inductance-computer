@@ -146,23 +146,23 @@ namespace AleaTestProject
             return result;
         }
 
-        public static double3[] RunDouble3()
+        public static Vector3[] RunDouble3()
         {
-            double3[] result = new double3[N];
+            Vector3[] result = new Vector3[N];
 
             Gpu.Default.For(0, result.Length, n =>
             {
-                result[n] = new double3();
+                result[n] = new Vector3();
                 result[n].x = (double)n;
             });
 
             return result;
         }
 
-        public static double3[] RunQuaternion()
+        public static Vector3[] RunQuaternion()
         {
-            double3[] result = new double3[N];
-            double3 unitX = new double3(1.0, 0.0, 0.0);
+            Vector3[] result = new Vector3[N];
+            Vector3 unitX = new Vector3(1.0, 0.0, 0.0);
 
             Gpu.Default.For(0, result.Length, n =>
             {
@@ -180,7 +180,7 @@ namespace AleaTestProject
 
             Gpu.Default.For(0, result.Length, n =>
             {
-                var Q = new Quaternion(1.0, 1.0, 1.0, 0.0);
+                var Q = Quaternion.Create(1.0, 1.0, 1.0, 0.0);
                 result[n] = Q.Conj;
             });
 

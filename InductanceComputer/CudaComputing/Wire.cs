@@ -10,10 +10,10 @@ namespace CudaComputing
 {
     public class Wire
     {
-        public double3 Position { get; private set; }
+        public Vector3 Position { get; private set; }
         public double FluxDensity { get; private set; }
 
-        public Wire(double3 position, Coil[] coils)
+        public Wire(Vector3 position, Coil[] coils)
         {
             Position = position;
             FluxDensity = 0.0;
