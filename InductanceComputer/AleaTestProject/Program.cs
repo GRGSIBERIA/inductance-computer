@@ -94,6 +94,26 @@ namespace AleaTestProject
             Console.WriteLine($"RunConjugate: {watch.ElapsedMilliseconds} ms");
         }
 
+        static void RunAggregate()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var result = AreaCore.RunAggregate();
+            watch.Stop();
+
+            Console.WriteLine($"RunAggregate: {watch.ElapsedMilliseconds} ms, {result}");
+        }
+
+        static void RunFluxDensity()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+            var wmng = AreaCore.RunFluxDensity();
+            watch.Stop();
+
+            Console.WriteLine($"RunFluxDensity: {watch.ElapsedMilliseconds} ms");
+        }
+
         static void Main(string[] args)
         {
             RunParallel();
@@ -101,6 +121,8 @@ namespace AleaTestProject
             RunVector();
             RunDouble3();
             RunConjugate();
+            RunAggregate();
+            RunFluxDensity();
         }
     }
 
@@ -185,6 +207,24 @@ namespace AleaTestProject
             });
 
             return result;
+        }
+
+        public static double RunAggregate()
+        {
+            var seed = new long[N];
+            for (int i = 1; i <= N; ++i)
+                seed[i - 1] = i;
+
+            return Gpu.Default.Aggregate(seed, (x, y) => x + y);
+        }
+
+        public static WireManager RunFluxDensity()
+        {
+            var wmng = new WireManager();
+            var cmng = new CoilManager();
+            wmng.ComputeFluxDensities(cmng);
+
+            return wmng;
         }
     }
 
