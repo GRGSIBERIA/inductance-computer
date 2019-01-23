@@ -60,33 +60,33 @@ namespace CudaComputing
 
         public static Vector3 operator +(Vector3 a, Vector3 b)
         {
-            return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+            return Create(a.x + b.x, a.y + b.y, a.z + b.z);
         }
 
         public static Vector3 operator -(Vector3 a, Vector3 b)
         {
-            return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+            return Create(a.x - b.x, a.y - b.y, a.z - b.z);
         }
 
         public static Vector3 operator /(Vector3 a, double b)
         {
             double c = 1.0 / b;
-            return new Vector3(c * a.x, c * a.y, c * a.z);
+            return Create(c * a.x, c * a.y, c * a.z);
         }
 
         public static Vector3 operator *(Vector3 a, double b)
         {
-            return new Vector3(a.x * b, a.y * b, a.z * b);
+            return Create(a.x * b, a.y * b, a.z * b);
         }
 
         public static Vector3 operator *(double b, Vector3 a)
         {
-            return new Vector3(a.x * b, a.y * b, a.z * b);
+            return Create(a.x * b, a.y * b, a.z * b);
         }
 
         public static Vector3 operator *(Vector3 a, Vector3 b)
         {
-            return new Vector3(
+            return Create(
                 a.y * b.z - a.z * b.y,
                 a.z * b.x - a.x * b.z,
                 a.x * b.y - a.y * b.x
@@ -135,7 +135,7 @@ namespace CudaComputing
         {
             get
             {
-                return new Vector3(x, y, z);
+                return Vector3.Create(x, y, z);
             }
         }
 
@@ -198,12 +198,12 @@ namespace CudaComputing
 
         public static Quaternion operator +(Quaternion a, Quaternion b)
         {
-            return new Quaternion(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+            return Create(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
         }
 
         public static Quaternion operator -(Quaternion a, Quaternion b)
         {
-            return new Quaternion(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+            return Create(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
         }
 
         public static Quaternion operator *(Quaternion a, Quaternion b)
@@ -212,28 +212,28 @@ namespace CudaComputing
             var B = b.V;
             var v = a.w * B + A * b.w + A * B;
 
-            return new Quaternion(v, a.w * b.w - Vector3.Dot(A, B));
+            return Create(v, a.w * b.w - Vector3.Dot(A, B));
         }
 
         public static Vector3 operator *(Quaternion Q, Vector3 vec)
         {
             var R = Q.Conj.Normalized;
-            var P = new Quaternion(vec, 0.0);
+            var P = Create(vec, 0.0);
             var cos = Math.Cos(Q.w * 0.5);
             var sin = Math.Sin(Q.w * 0.5);
 
             var ret = R.Normalized * P * Q.Normalized;
-            return new Vector3(ret.x, ret.y, ret.z);
+            return Vector3.Create(ret.x, ret.y, ret.z);
         }
 
         public static Quaternion operator *(Quaternion a, double b)
         {
-            return new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
+            return Create(a.x * b, a.y * b, a.z * b, a.w * b);
         }
 
         public static Quaternion operator *(double b, Quaternion a)
         {
-            return new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
+            return Create(a.x * b, a.y * b, a.z * b, a.w * b);
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace CudaComputing
         /// <returns>軸周りのクォータニオン</returns>
         public static Quaternion AxisAngle(Vector3 axis, double angle)
         {
-            return new Quaternion(axis.Normalized, angle);
+            return Create(axis.Normalized, angle);
         }
     }
 }
