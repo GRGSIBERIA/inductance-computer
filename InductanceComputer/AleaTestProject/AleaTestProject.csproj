@@ -26,13 +26,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Alea, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ba52afc3c2e933d6, processorArchitecture=MSIL">
@@ -43,9 +45,6 @@
     </Reference>
     <Reference Include="Alea.Parallel, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ba52afc3c2e933d6, processorArchitecture=MSIL">
       <HintPath>..\packages\Alea.3.0.4\lib\net45\Alea.Parallel.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.4.5.4\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
