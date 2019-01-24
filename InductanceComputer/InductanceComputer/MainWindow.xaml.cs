@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Forms;
 
 namespace InductanceComputer
 {
@@ -23,6 +24,17 @@ namespace InductanceComputer
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void ButtonLoadFile_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Open CSV File";
+            dialog.Filter = "CSV (*.csv)|*.csv";
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBoxCSVPath.Text = dialog.FileName;
+            }
         }
     }
 }
