@@ -113,6 +113,21 @@ namespace CudaComputing
         #endregion
 
         /// <summary>
+        /// 明示的な外積の呼び出し
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>外積の結果</returns>
+        public static Vector3 Cross(Vector3 a, Vector3 b)
+        {
+            return Create(
+                a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x
+                );
+        }
+
+        /// <summary>
         /// ベクトルの内積，内部で正規化はおこなわない　
         /// </summary>
         /// <param name="a">ベクトルA</param>
