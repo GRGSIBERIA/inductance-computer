@@ -10,6 +10,15 @@ namespace CudaComputing
 {
     public class Field
     {
+        /// <summary>
+        /// 測定点の磁束密度を求める
+        /// </summary>
+        /// <param name="measurePoint">測定点の位置</param>
+        /// <param name="fluxies">ワイヤ磁束密度の集合</param>
+        /// <param name="wirePositions">ワイヤ座標の集合</param>
+        /// <param name="fronts">コイルの正面の集合</param>
+        /// <param name="gamma"></param>
+        /// <returns>測定点の磁束密度</returns>
         private double FluxDensityOfMeasurePoint(Vector3 measurePoint, double[] fluxies, Vector3[] wirePositions, Vector3[] fronts, double gamma)
         {
             double flux = 0.0;
