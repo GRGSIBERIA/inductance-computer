@@ -75,20 +75,52 @@ namespace CudaComputing
     public class CoilManager
     {
         public Coil[] Coils { get; private set; }
+        public double Gamma { get; private set; }
         public int DivideRadius { get; private set; }
         public int DivideTheta { get; private set; }
 
-        public CoilManager(int divideRadius = 700, int divideTheta = 720)
+        public Vector3[] Fronts
         {
-            DivideRadius = divideRadius;
-            DivideTheta = divideTheta;
+            get
+            {
+                Vector3[] fronts = new Vector3[Coils.Length];
+                for (int i = 0; i < Coils.Length; ++i)
+                    fronts[i] = Coils[i].Forward;
+                return fronts;
+            }
+        }
 
+        public Vector3[] Positions
+        {
+            get
+            {
+                Vector3[] positions = new Vector3[Coils.Length];
+                for (int i = 0; i < Coils.Length; ++i)
+                    positions[i] = Coils[i].Position;
+                return positions;
+            }
+        }
+
+        private void MigrateDefaultParameter()
+        {
             const int N = 8;
             Coils = new Coil[N];
             for (int i = 0; i < N; ++i)
             {
-                Coils[i] = new Coil(Vector3.Create(0.0, (double)i * 2, 0.0), Vector3.Create(0.0, 0.0, 1.0), Vector3.Create(1.0, 0.0, 0.0), 1, 1);
+                Coils[i] = new Coil(
+                    Vector3.Create(0.0, (double)i * 2, 0.0), 
+                    Vector3.Create(0.0, 0.0, 1.0), 
+                    Vector3.Create(1.0, 0.0, 0.0), 1, 1);
             }
+        }
+
+        public CoilManager(double gamma = 1.0, int divideRadius = 700, int divideTheta = 720)
+        {
+            Gamma = gamma;
+            DivideRadius = divideRadius;
+            DivideTheta = divideTheta;
+
+            MigrateDefaultParameter();
         }
     }
 }

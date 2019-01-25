@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-
+using Alea;
 
 namespace CudaComputing
 {
@@ -14,6 +14,13 @@ namespace CudaComputing
         public double x, y, z;
 
         public static Vector3 Create(double x, double y, double z)
+        {
+            Vector3 v;
+            v.x = x; v.y = y; v.z = z;
+            return v;
+        }
+
+        public static Vector3 Create(int x, int y, int z)
         {
             Vector3 v;
             v.x = x; v.y = y; v.z = z;
@@ -58,6 +65,7 @@ namespace CudaComputing
         }
         #endregion
 
+        #region Operator
         public static Vector3 operator +(Vector3 a, Vector3 b)
         {
             return Create(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -72,6 +80,16 @@ namespace CudaComputing
         {
             double c = 1.0 / b;
             return Create(c * a.x, c * a.y, c * a.z);
+        }
+
+        public static Vector3 operator /(Vector3 a, Vector3 b)
+        {
+            return Create(a.x / b.x, a.y / b.y, a.z / b.z);
+        }
+
+        public static Vector3 operator /(Vector3 a, int3 b)
+        {
+            return Create(a.x / b.x, a.y / b.y, a.z / b.z);
         }
 
         public static Vector3 operator *(Vector3 a, double b)
@@ -92,6 +110,7 @@ namespace CudaComputing
                 a.x * b.y - a.y * b.x
                 );
         }
+        #endregion
 
         /// <summary>
         /// ベクトルの内積，内部で正規化はおこなわない　

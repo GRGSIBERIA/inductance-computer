@@ -102,6 +102,28 @@ namespace CudaComputing
     {
         public Wire[] Wires { get; private set; }
 
+        public Vector3[] Positions
+        {
+            get
+            {
+                Vector3[] positions = new Vector3[Wires.Length];
+                for (int i = 0; i < Wires.Length; ++i)
+                    positions[i] = Wires[i].Position;
+                return positions;
+            }
+        }
+
+        public double[] FluxDensities
+        {
+            get
+            {
+                double[] fluxies = new double[Wires.Length];
+                for (int i = 0; i < Wires.Length; ++i)
+                    fluxies[i] = Wires[i].FluxDensity;
+                return fluxies;
+            }
+        }
+
         public WireManager()
         {
             const int N = 100;
