@@ -31,7 +31,7 @@
                         <RowDefinition Height="50*"/>
                     </Grid.RowDefinitions>
                     <WindowsFormsHost Grid.Row="0" Background="Gray" Grid.RowSpan="2" Grid.Column="1">
-                        <wfc:Chart />
+                        <wfc:Chart Name="ChartWiredFluxDensity" />
                     </WindowsFormsHost>
                     <Button x:Name="buttonSave" Content="Save" HorizontalAlignment="Left" Margin="308,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75"/>
                     <Button x:Name="buttonComputeFluxDensity" Content="Compute" HorizontalAlignment="Left" Margin="308,35,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75"/>

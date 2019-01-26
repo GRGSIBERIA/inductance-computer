@@ -98,22 +98,12 @@ namespace GnuPlot
             });
         }
 
-        /// <summary>
-        /// プロット文を差し込む
-        /// </summary>
-        /// <param name="arguments"></param>
-        public void SetPlot(string arguments)
-        {
-            WriteProcedure(ScriptPath, (stream) =>
-            {
-                
-            });
-        }
-
         private void WriteScript(string arguments)
         {
             WriteProcedure(ScriptPath, (stream) =>
             {
+                stream.WriteLine("set terminal postscript enhanced color");
+                stream.WriteLine($"set output '{Path.GetFileNameWithoutExtension(ScriptPath)}.eps'");
                 stream.WriteLine($"plot \"{DatPath}\" {arguments}");
                 foreach (var fetch in fetchScripts)
                 {
@@ -129,8 +119,8 @@ namespace GnuPlot
         public void Execute(string plotArguments = "")
         {
             WriteScript(plotArguments);
-
-            var command = $"wgnuplot \"{Directory.GetCurrentDirectory()}\\{ScriptPath}\"";
+            var path = $"\"{Directory.GetCurrentDirectory()}\\{ScriptPath}\"";
+            var command = $"wgnuplot \"{ScriptPath}\"";
             Process.Start(command);
         }
     }
