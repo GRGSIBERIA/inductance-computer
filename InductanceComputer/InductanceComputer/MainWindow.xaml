@@ -7,43 +7,25 @@
         xmlns:wfc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
         xmlns:local="clr-namespace:InductanceComputer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Inductance Computer" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+        </Grid.ColumnDefinitions>
+        <Menu Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="File (_F)"/>
         </Menu>
-        <Button Grid.Row="1" x:Name="buttonLoadFile" Content="Load" Click="ButtonLoadFile_Click" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Grid.RowSpan="2"/>
-        <TextBox Grid.Row="1" x:Name="textBoxCSVPath" HorizontalAlignment="Left" Height="20" Margin="90,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="293" Grid.RowSpan="2"/>
-        <TabControl Grid.Row="2" x:Name="tabControl" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Stretch" Width="792" Margin="0,35,0,0">
+        <TabControl Grid.Row="2" Grid.Column="1" x:Name="tabControl" Height="Auto" VerticalAlignment="Stretch">
             <TabItem Header="Wired Flux Density">
                 <Grid Background="#FFE5E5E5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50*"/>
-                        <ColumnDefinition Width="50*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50*"/>
-                        <RowDefinition Height="50*"/>
-                    </Grid.RowDefinitions>
                     <WindowsFormsHost Grid.Row="0" Background="Gray" Grid.RowSpan="2" Grid.Column="1">
                         <wfc:Chart Name="ChartWiredFluxDensity" />
                     </WindowsFormsHost>
-                    <Button x:Name="buttonSave" Content="Save" HorizontalAlignment="Left" Margin="308,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75"/>
-                    <Button x:Name="buttonComputeFluxDensity" Content="Compute" HorizontalAlignment="Left" Margin="308,35,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75"/>
-                    <Label x:Name="label" Content="xlim" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBoxXlimMin" HorizontalAlignment="Left" Height="23" Margin="47,41,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <TextBox x:Name="textBoxXlimMax" HorizontalAlignment="Left" Height="23" Margin="122,41,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <Label x:Name="label1" Content="ylim" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBoxYlimMin" HorizontalAlignment="Left" Height="23" Margin="47,73,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <TextBox x:Name="textBoxYlimMax" HorizontalAlignment="Left" Height="23" Margin="122,73,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="70"/>
-                    <Label x:Name="label2" Content="min" HorizontalAlignment="Left" Margin="47,10,0,0" VerticalAlignment="Top"/>
-                    <Label x:Name="label3" Content="max" HorizontalAlignment="Left" Margin="122,10,0,0" VerticalAlignment="Top"/>
-
                 </Grid>
             </TabItem>
             <TabItem Header="Field Flux Density">
@@ -54,6 +36,36 @@
                 </Grid>
             </TabItem>
         </TabControl>
-
+        <Grid Grid.Row="1" Background="#FFE5E5E5">
+            <StackPanel Margin="8,8,8,8">
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="buttonLoadFile" Content="Load" Click="ButtonLoadFile_Click" Width="75"/>
+                    <TextBox x:Name="textBoxCSVPath" Height="24" TextWrapping="Wrap" Text="" Width="293" Margin="8,0,0,0"/>
+                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition Width="64" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="limit" />
+                    <Label Grid.Row="0" Grid.Column="1" Content="low" />
+                    <Label Grid.Row="0" Grid.Column="2" Content="high" />
+                    <Label Grid.Row="1" Content="xlim" />
+                    <Label Grid.Row="2" Content="ylim" />
+                    <TextBox x:Name="textBoxXlimLow" Grid.Row="1" Grid.Column="1" Margin="2,2,2,2" />
+                    <TextBox x:Name="textBoxXlimHigh" Grid.Row="2" Grid.Column="1" Margin="2,2,2,2" />
+                    <TextBox x:Name="textBoxYlimLow" Grid.Row="1" Grid.Column="2" Margin="2,2,2,2" />
+                    <TextBox x:Name="textBoxYlimHigh" Grid.Row="2" Grid.Column="2" Margin="2,2,2,2" />
+                </Grid>
+                <Button Content="Compute" Margin="8,8,8,8" />
+                <Button Content="Save" Margin="8,8,8,8" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
