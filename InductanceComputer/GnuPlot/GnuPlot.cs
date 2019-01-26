@@ -106,14 +106,15 @@ namespace GnuPlot
         {
             WriteProcedure(ScriptPath, (stream) =>
             {
-                stream.WriteLine($"plot \"{DatPath}\" {arguments}");
+                
             });
         }
 
-        private void WriteScript()
+        private void WriteScript(string arguments)
         {
             WriteProcedure(ScriptPath, (stream) =>
             {
+                stream.WriteLine($"plot \"{DatPath}\" {arguments}");
                 foreach (var fetch in fetchScripts)
                 {
                     stream.WriteLine(fetch);
@@ -125,11 +126,12 @@ namespace GnuPlot
         /// <summary>
         /// wgnuplotコマンドを実行する
         /// </summary>
-        public void Execute()
+        public void Execute(string plotArguments = "")
         {
-            WriteScript();
+            WriteScript(plotArguments);
 
-            Process.Start($"wgnuplot \"{ScriptPath}\"");
+            var command = $"wgnuplot \"{Directory.GetCurrentDirectory()}\\{ScriptPath}\"";
+            Process.Start(command);
         }
     }
 }

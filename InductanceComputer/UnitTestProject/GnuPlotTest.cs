@@ -29,7 +29,7 @@ namespace UnitTestProject
             }
 
             gnu.FetchData(x, y);
-            gnu.SetPlot("");
+            gnu.Execute();
         }
     }
 }
