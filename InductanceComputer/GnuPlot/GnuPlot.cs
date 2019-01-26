@@ -36,6 +36,22 @@ namespace GnuPlot
         }
 
         /// <summary>
+        /// ファイルを書き込むための関数
+        /// </summary>
+        /// <param name="path">pathに応じたStreamWriterを開く</param>
+        /// <param name="func">匿名関数を投げる</param>
+        private void WriteProcedure(string path, Action<StreamWriter> func)
+        {
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                using (var writer = new StreamWriter(stream))
+                {
+                    func(writer);
+                }
+            }
+        }
+
+        /// <summary>
         /// DATファイルにデータを書き込む
         /// </summary>
         /// <param name="X">X軸のデータ</param>
@@ -45,33 +61,70 @@ namespace GnuPlot
             if (X.Length != Y.Length)
                 throw new NoMatchArrayLengthException();
 
-            using (var dat = new FileStream(DatPath, FileMode.Create))
+            WriteProcedure(DatPath, (stream) =>
             {
-                using (var stream = new StreamWriter(dat))
+                for (int i = 0; i < X.Length; ++i)
                 {
-                    for (int i = 0; i < X.Length; ++i)
-                    {
-                        stream.WriteLine($"{X[i]}   {Y[i]}");
-                    }
+                    stream.WriteLine($"{X[i]}   {Y[i]}");
                 }
-            }
+            });
+        }
+
+        /// <summary>
+        /// X軸の値が同一の複数のデータをプロットする
+        /// </summary>
+        /// <param name="X">種になるX軸のデータ</param>
+        /// <param name="Ys">Y軸の複数データ</param>
+        public void WriteData(double[] X, double[][] Ys)
+        {
+            if (X.Length != Ys.Length)
+                throw new NoMatchArrayLengthException();
+
+            WriteProcedure(DatPath, (stream) =>
+            {
+                int prevLength = 0;
+                if (Ys.Length > 0)
+                    prevLength = Ys[0].Length;
+
+                for (int i = 0; i < X.Length; ++i)
+                {
+                    if (prevLength != Ys[i].Length)
+                        throw new NoMatchArrayLengthException();
+                    prevLength = Ys[i].Length;
+
+                    var line = $"{X[i]}\t" + string.Join("\t", Ys[i]);
+                    stream.WriteLine(line);
+                }
+            });
+        }
+
+        /// <summary>
+        /// プロット文を差し込む
+        /// </summary>
+        /// <param name="arguments"></param>
+        public void SetPlot(string arguments)
+        {
+            WriteProcedure(ScriptPath, (stream) =>
+            {
+                stream.WriteLine($"plot \"{DatPath}\" {arguments}");
+            });
         }
 
         private void WriteScript()
         {
-            using (var script = new FileStream(ScriptPath, FileMode.Create))
+            WriteProcedure(ScriptPath, (stream) =>
             {
-                using (var stream = new StreamWriter(script))
+                foreach (var fetch in fetchScripts)
                 {
-                    foreach (var fetch in fetchScripts)
-                    {
-                        stream.WriteLine(fetch);
-                    }
-                    stream.WriteLine("pause -1");
+                    stream.WriteLine(fetch);
                 }
-            }
+                stream.WriteLine("pause -1");
+            });
         }
 
+        /// <summary>
+        /// wgnuplotコマンドを実行する
+        /// </summary>
         public void Execute()
         {
             WriteScript();
