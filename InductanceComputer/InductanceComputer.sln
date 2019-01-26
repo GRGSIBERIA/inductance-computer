@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CudaComputing", "CudaComput
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AleaTestProject", "AleaTestProject\AleaTestProject.csproj", "{D077175A-2681-46CE-ABD8-AC55A21A4A74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{DFEDA156-C847-4969-A6E9-D2A2178FE2B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GnuPlot", "GnuPlot\GnuPlot.csproj", "{A15F46DB-4152-4D86-9736-61A98650D6E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D077175A-2681-46CE-ABD8-AC55A21A4A74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFEDA156-C847-4969-A6E9-D2A2178FE2B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFEDA156-C847-4969-A6E9-D2A2178FE2B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFEDA156-C847-4969-A6E9-D2A2178FE2B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFEDA156-C847-4969-A6E9-D2A2178FE2B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A15F46DB-4152-4D86-9736-61A98650D6E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A15F46DB-4152-4D86-9736-61A98650D6E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A15F46DB-4152-4D86-9736-61A98650D6E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A15F46DB-4152-4D86-9736-61A98650D6E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
