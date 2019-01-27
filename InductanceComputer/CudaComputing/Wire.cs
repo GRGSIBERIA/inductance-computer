@@ -9,7 +9,7 @@ using Alea.Parallel;
 
 namespace CudaComputing
 {
-    public class Wire : IEquatable<Wire>, IStructuralEquatable, IComparable<Wire>, IComparable, IStructuralComparable
+    public struct Wire : IEquatable<Wire>, IStructuralEquatable, IComparable<Wire>, IComparable, IStructuralComparable
     {
         public Vector3 Position { get; private set; }
         public double FluxDensity { get; private set; }
@@ -17,10 +17,11 @@ namespace CudaComputing
         public Wire(Vector3 position)
         {
             Position = position;
+            FluxDensity = 0.0;
         }
 
         [GpuManaged]
-        public double ComputeFluxDensity(CoilManager coilManager)
+        public double ComputeFluxDensity(CoilManager coilManager, int timeIndex)
         {
             var result = new double[coilManager.Coils.Length, coilManager.DivideTheta, coilManager.DivideRadius];
 
@@ -30,7 +31,7 @@ namespace CudaComputing
 
             for (int coilId = 0; coilId < coilManager.Coils.Length; ++coilId)
             {
-                var coil = coilManager.Coils[coilId];   // コイルごとに穴埋めする
+                var coil = coilManager.Coils[coilId, timeIndex];   // コイルごとに穴埋めする
 
                 Gpu.Default.For(0, coilManager.DivideRadius * coilManager.DivideTheta, id =>
                 {
@@ -133,11 +134,19 @@ namespace CudaComputing
                 Wires[i] = new Wire(Vector3.Create((double)i, 0.0, 10.0));
         }
 
-        public void ComputeFluxDensities(CoilManager coilManager)
+        public void RecieveWireData(int count, Vector3[] positions)
+        {
+            Wires = new Wire[count];
+
+            for (int i = 0; i < count; ++i)
+                Wires[i] = new Wire(positions[i]);
+        }
+
+        public void ComputeFluxDensities(CoilManager coilManager, int timeIndex)
         {
             foreach (var wire in Wires)
             {
-                wire.ComputeFluxDensity(coilManager);
+                wire.ComputeFluxDensity(coilManager, timeIndex);
             }
         }
     }

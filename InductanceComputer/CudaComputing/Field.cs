@@ -50,35 +50,41 @@ namespace CudaComputing
         /// <param name="partitionSize">空間の分割数</param>
         /// <param name="coilManager"></param>
         /// <param name="wireManager"></param>
+        /// <param name="timeIndex">時間のインデックス</param>
+        /// <param name="timeCount">時間の数</param>
         /// <returns></returns>
         [GpuManaged]
-        public double[,,] FieldFluxDensity(Vector3 fieldSize, int3 partitionSize, CoilManager coilManager, WireManager wireManager)
+        public double[,,] FieldFluxDensity(Vector3 fieldSize, int3 partitionSize, CoilManager coilManager, WireManager wireManager, int timeIndex, int timeCount)
         {
             var fieldFluxDensity = new double[partitionSize.x, partitionSize.y, partitionSize.z];
             var fluxies = Gpu.Default.Allocate(wireManager.FluxDensities);
-            var fronts = Gpu.Default.Allocate(coilManager.Fronts);
             var wirePositions = Gpu.Default.Allocate(wireManager.Positions);
-            var gamma = coilManager.Gamma;
 
             // インクリメントあたりの大きさ
             var incrementSize = Vector3.Create(fieldSize.x / partitionSize.x, fieldSize.y / partitionSize.y, fieldSize.z / partitionSize.z);
 
-            for (int zi = 0; zi < partitionSize.z; ++zi)
+            for (int ci = 0; ci < coilManager.CoilCount; ++ci)
             {
-                for (int yi = 0; yi < partitionSize.y; ++yi)
-                {
-                    Gpu.Default.For(0, partitionSize.x, xi =>
-                    {
-                        // 測定点の磁束密度を求める
-                        var measurePoint = Vector3.Create(xi, yi, zi) * incrementSize;  // 測定点
+                var fronts = Gpu.Default.Allocate(coilManager.Fronts(ci));
 
-                        fieldFluxDensity[xi, yi, zi] = FluxDensityOfMeasurePoint(measurePoint, fluxies, wirePositions, fronts, gamma);
-                    });
+                for (int zi = 0; zi < partitionSize.z; ++zi)
+                {
+                    for (int yi = 0; yi < partitionSize.y; ++yi)
+                    {
+                        Gpu.Default.For(0, partitionSize.x, xi =>
+                        {
+                            // 測定点の磁束密度を求める
+                            var measurePoint = Vector3.Create(xi, yi, zi) * incrementSize;  // 測定点
+
+                            fieldFluxDensity[xi, yi, zi] = FluxDensityOfMeasurePoint(measurePoint, fluxies, wirePositions, fronts, gamma);
+                        });
+                    }
                 }
+
+                Gpu.Free(fronts);
             }
 
             Gpu.Free(fluxies);
-            Gpu.Free(fronts);
             Gpu.Free(wirePositions);
             Gpu.Default.Synchronize();
 
@@ -89,6 +95,7 @@ namespace CudaComputing
         {
             Vector3 divisionSize = size / partitionSize;
 
+            // Inductanceの処理を書く
 
             return 0.0;
         }
