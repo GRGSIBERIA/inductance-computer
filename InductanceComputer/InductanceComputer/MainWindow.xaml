@@ -6,7 +6,7 @@
         xmlns:wfc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
         xmlns:local="clr-namespace:InductanceComputer"
         mc:Ignorable="d"
-        Title="Inductance Computer" Height="450" Width="800">
+        Title="Inductance Computer" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,6 +20,13 @@
             <MenuItem Header="File (_F)"/>
         </Menu>
         <TabControl Grid.Row="2" Grid.Column="1" x:Name="tabControl" Height="Auto" VerticalAlignment="Stretch">
+            <TabItem Header="Positioning">
+                <Grid Background="#FFE5E5E5">
+                    <WindowsFormsHost Grid.Row="0" Background="Gray" Grid.RowSpan="2" Grid.Column="1">
+                        <wfc:Chart Name="chartPositioning" />
+                    </WindowsFormsHost>
+                </Grid>
+            </TabItem>
             <TabItem Header="Wired Flux Density">
                 <Grid Background="#FFE5E5E5">
                     <WindowsFormsHost Grid.Row="0" Background="Gray" Grid.RowSpan="2" Grid.Column="1">
@@ -61,6 +68,68 @@
                     </Grid>
                 </GroupBox>
 
+                <GroupBox Header="View Space" Margin="4,4,4,4">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="space" Margin="2,2,2,2 "/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" SelectedIndex="0">
+                            <ComboBoxItem Content="X-Y"/>
+                            <ComboBoxItem Content="X-Z"/>
+                            <ComboBoxItem Content="Y-Z"/>
+                        </ComboBox>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="position" Margin="2,2,2,2" />
+                        <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" x:Name="sliderPosition"/>
+                        <Label Grid.Row="1" Grid.Column="3" Content="{Binding Value, ElementName=sliderPosition}" Margin="2,2,2,2"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Content="time" Margin="2,2,2,2" />
+                        <Slider Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" x:Name="sliderTime"/>
+                        <Label Grid.Row="2" Grid.Column="3" Content="{Binding Value, ElementName=sliderTime}" Margin="2,2,2,2"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Analyzing Space" Margin="4,4,4,4">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="64"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Content="axis" Margin="2,2,2,2"/>
+                        <Label Grid.Row="0" Grid.Column="1" Content="x" Margin="2,2,2,2" HorizontalAlignment="Center"/>
+                        <Label Grid.Row="0" Grid.Column="2" Content="y" Margin="2,2,2,2" HorizontalAlignment="Center"/>
+                        <Label Grid.Row="0" Grid.Column="3" Content="z" Margin="2,2,2,2" HorizontalAlignment="Center"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Content="space" Margin="2,2,2,2"/>
+                        <TextBox x:Name="textBoxSpaceX" Grid.Row="1" Grid.Column="1" Margin="4,4,4,4"/>
+                        <TextBox x:Name="textBoxSpaceY" Grid.Row="1" Grid.Column="2" Margin="4,4,4,4"/>
+                        <TextBox x:Name="textBoxSpaceZ" Grid.Row="1" Grid.Column="3" Margin="4,4,4,4"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Content="partition" Margin="2,2,2,2" />
+                        <TextBox x:Name="textBoxPartitionX" Grid.Row="2" Grid.Column="1" Margin="4,4,4,4"/>
+                        <TextBox x:Name="textBoxPartitionY" Grid.Row="2" Grid.Column="2" Margin="4,4,4,4"/>
+                        <TextBox x:Name="textBoxPartitionZ" Grid.Row="2" Grid.Column="3" Margin="4,4,4,4"/>
+                    </Grid>
+                </GroupBox>
+
                 <GroupBox Header="Plot limitation" Margin="4,4,4,4">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -74,8 +143,8 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Label Grid.Row="0" Grid.Column="0" Content="limit" />
-                        <Label Grid.Row="0" Grid.Column="1" Content="low" />
-                        <Label Grid.Row="0" Grid.Column="2" Content="high" />
+                        <Label Grid.Row="0" Grid.Column="1" Content="low" HorizontalAlignment="Center" />
+                        <Label Grid.Row="0" Grid.Column="2" Content="high" HorizontalAlignment="Center" />
                         <Label Grid.Row="1" Content="xlim" />
                         <Label Grid.Row="2" Content="ylim" />
                         <TextBox x:Name="textBoxXlimLow" Grid.Row="1" Grid.Column="1" Margin="2,2,2,2" />
@@ -85,30 +154,6 @@
                     </Grid>
                 </GroupBox>
 
-                <GroupBox Header="View Space" Margin="4,4,4,4">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="64"/>
-                            <ColumnDefinition Width="64"/>
-                            <ColumnDefinition Width="64"/>
-                            <ColumnDefinition Width="64"/>
-                        </Grid.ColumnDefinitions>
-                    
-                        <Label Grid.Row="0" Grid.Column="0" Content="space" Margin="2,2,2,2 "/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" SelectedIndex="0">
-                            <ComboBoxItem Content="X-Y"/>
-                            <ComboBoxItem Content="X-Z"/>
-                            <ComboBoxItem Content="Y-Z"/>
-                        </ComboBox>
-                        <Label Grid.Row="1" Grid.Column="0" Content="position" Margin="2,2,2,2" />
-                        <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" x:Name="sliderPosition"/>
-                        <Label Grid.Row="1" Grid.Column="3" Content="{Binding Value, ElementName=sliderPosition}" Margin="2,2,2,2"/>
-                    </Grid>
-                </GroupBox>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="70*"/>
@@ -119,8 +164,10 @@
                         <RowDefinition Height="32"/>
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" Content="Compute" Margin="4,4,4,4" />
-                    <Label Grid.Row="1" Content="Size" HorizontalAlignment="Right" Margin="4,4,4,4" />
+                    <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Content="Compute" Margin="4,4,4,4" />
+                    <Button Grid.Column="1" Grid.Row="0" Content="Current" Margin="4,4,4,4" />
+                    <Button Grid.Column="2" Grid.Row="0" Content="All" Margin="4,4,4,4" />
+                    <Label Grid.Row="1" Content="Screenshot" HorizontalAlignment="Right" Margin="4,4,4,4" />
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="4,4,4,4" SelectedIndex="0">
                         <ComboBoxItem Content="x1" />
                         <ComboBoxItem Content="x2" />
@@ -129,7 +176,7 @@
                     </ComboBox>
                     <Button Grid.Row="1" Grid.Column="2" Content="Save" Margin="4,4,4,4" />
                 </Grid>
-                
+
             </StackPanel>
         </Grid>
     </Grid>
