@@ -94,6 +94,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Loader\WireLoader.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -128,6 +129,15 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Structure\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CudaComputing\CudaComputing.csproj">
+      <Project>{dfec85c7-0373-471c-9f1b-f3066230ab81}</Project>
+      <Name>CudaComputing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
