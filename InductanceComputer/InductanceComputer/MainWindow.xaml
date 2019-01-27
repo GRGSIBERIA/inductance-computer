@@ -83,7 +83,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Content="space" Margin="2,2,2,2 "/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,2,2,2" SelectedIndex="0">
+                        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2,4,4,4" SelectedIndex="0">
                             <ComboBoxItem Content="X-Y"/>
                             <ComboBoxItem Content="X-Z"/>
                             <ComboBoxItem Content="Y-Z"/>
