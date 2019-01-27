@@ -26,14 +26,25 @@ namespace InductanceComputer
             InitializeComponent();
         }
 
-        private void ButtonLoadFile_Click(object sender, RoutedEventArgs e)
+        private void ButtonLoadWireFile_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Title = "Open CSV File";
+            dialog.Title = "Open Wire CSV File";
             dialog.Filter = "CSV (*.csv)|*.csv";
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                textBoxCSVPath.Text = dialog.FileName;
+                textBoxWireCSVPath.Text = dialog.FileName;
+            }
+        }
+
+        private void ButtonLoadCoilFile_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Title = "Open Coil CSV File";
+            dialog.Filter = "CSV (*.csv)|*.csv";
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBoxCoilCSVPath.Text = dialog.FileName;
             }
         }
     }
