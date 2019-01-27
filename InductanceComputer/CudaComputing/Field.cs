@@ -59,13 +59,15 @@ namespace CudaComputing
             var fieldFluxDensity = new double[partitionSize.x, partitionSize.y, partitionSize.z];
             var fluxies = Gpu.Default.Allocate(wireManager.FluxDensities);
             var wirePositions = Gpu.Default.Allocate(wireManager.Positions);
+            var fronts = Gpu.Default.Allocate(new Vector3[timeCount]);
 
             // インクリメントあたりの大きさ
             var incrementSize = Vector3.Create(fieldSize.x / partitionSize.x, fieldSize.y / partitionSize.y, fieldSize.z / partitionSize.z);
 
             for (int ci = 0; ci < coilManager.CoilCount; ++ci)
             {
-                var fronts = Gpu.Default.Allocate(coilManager.Fronts(ci));
+                fronts = coilManager.Fronts(ci);
+                var gamma = coilManager.Coils[ci, timeIndex].Gamma;
 
                 for (int zi = 0; zi < partitionSize.z; ++zi)
                 {
@@ -80,10 +82,9 @@ namespace CudaComputing
                         });
                     }
                 }
-
-                Gpu.Free(fronts);
             }
 
+            Gpu.Free(fronts);
             Gpu.Free(fluxies);
             Gpu.Free(wirePositions);
             Gpu.Default.Synchronize();
@@ -91,7 +92,7 @@ namespace CudaComputing
             return fieldFluxDensity;
         }
 
-        public double Inductance(double[,,] previeousInductance, double deltaTime, Vector3 size, int3 partitionSize)
+        public double Inductance(double[,,] previeousFluxDensity, double deltaTime, Vector3 size, int3 partitionSize)
         {
             Vector3 divisionSize = size / partitionSize;
 
