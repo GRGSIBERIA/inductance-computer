@@ -3,23 +3,25 @@ from typing import List
 from time import time
 from numba import jit, f8, i4, f4, prange
 import numpy as np 
-from scipy.integrate import dblquad
+from scipy.integrate import nquad
 
 @jit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
 def mul_quaternion_R(Qi, Qr, Pi, Pr):
     """クォータニオンの積，実数部を返す"""
-    return Qr * Pr - np.dot(Qi, Pi)
+    #return Qr * Pr - np.dot(Qi, Pi)
+    return Qr * Pr - (Qi[0] * Pi[0] + Qi[1] * Pi[1] + Qi[2] * Pi[2])
 
 @jit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
 def mul_quaternion_I(Qi, Qr, Pi, Pr):
     """クォータニオンの積，虚数部を返す"""
-    return Qr * Pi + Pr * Qi + np.cross(Qi, Pi)
+    #return Qr * Pi + Pr * Qi + np.cross(Qi, Pi)
+    return Qr * Pi + Pr * Qi + np.array([Qi[1] * Pi[2] - Qi[2] * Pi[1], Qi[2] * Pi[0] - Qi[0] * Pi[2], Qi[0] * Pi[1] - Qi[1] * Pi[0]])
 
 @jit(f8(f8, f8, f8[:], f8[:], f8[:], f8[:], f8), nogil=True, cache=True)
 def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, sigma: float):
     # クォータニオンの計算
-    cos = np.cos(dr)
-    sin = np.sin(dr)
+    cos = np.cos(dt)
+    sin = np.sin(dt)
 
     Qi = coil_forward * sin
     Qr = cos
@@ -41,15 +43,16 @@ def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: 
     frac_down = frac_down * frac_down * frac_down
     return frac_up / frac_down
 
+@jit(f8(f8[:], f8[:], f8[:], f8[:], f8, f8, f4), nogil=True)
 def wired_flux_density(wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, coil_height: float, coil_radius: float, sigma: float):
     quadargs1 = (wire_position, coil_position + coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
     quadargs2 = (wire_position, coil_position - coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
     
-    top = dblquad(double_quad, 0, 2.*np.pi, lambda x: 0, lambda x: coil_radius, args=quadargs1)[0]
-    under = dblquad(double_quad, 0, 2.*np.pi, lambda x: 0, lambda x: coil_radius, args=quadargs2)[0]
+    top = nquad(double_quad, [[0., 2.*np.pi], [0., coil_radius]], args=quadargs1)[0]
+    under = nquad(double_quad, [[0., 2.*np.pi], [0., coil_radius]], args=quadargs2)[0]
     return top - under
 
-@jit(f8[:](i4, f8[:,:], i4, f8[:,:], f8[:,:], f8[:,:], f4[:], f4[:], f4), parallel=True)
+@jit(f8[:](i4, f8[:,:], i4, f8[:,:], f8[:,:], f8[:,:], f8[:], f8[:], f4), parallel=True, nogil=True)
 def wired_flux_density_on_coils(wire_count: int, wire_positions: np.ndarray, coil_count: int, coil_positions: np.ndarray, coil_forwards: np.ndarray, coil_rights: np.ndarray, coil_heights: List[float], coil_radius: List[float], sigma: float):
     totals = []
     for wi in prange(wire_count):
@@ -59,24 +62,29 @@ def wired_flux_density_on_coils(wire_count: int, wire_positions: np.ndarray, coi
         totals.append(total)
     return np.array(totals, dtype="f8")
 
-wire_count = 100
-wire_positions = np.array([[0.5*x - 25., 0., 5.] for x in range(wire_count)], dtype="f8")
 
-coil_count = 2
-coil_positions = np.array([[0, -3, 0], [0, 3, 0]], dtype="f8")
-coil_fronts = np.array([[0, 0, 1] for x in range(coil_count)], dtype="f8")
-coil_rights = np.array([[1, 0, 0] for x in range(coil_count)], dtype="f8")
-coil_heights = np.array([1 for x in range(coil_count)])
-coil_radius = np.array([1 for x in range(coil_count)])
+def main():
+    wire_count = 100
+    wire_positions = np.array([[0.5*x - 25., 0., 5.] for x in range(wire_count)], dtype="f8")
 
-start = time()
-fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_fronts, coil_rights, coil_heights, coil_radius, 1.)
-elapsed = time() - start
+    coil_count = 2
+    coil_positions = np.array([[0, -3, 0], [0, 3, 0]], dtype="f8")
+    coil_fronts = np.array([[0, 0, 1] for x in range(coil_count)], dtype="f8")
+    coil_rights = np.array([[1, 0, 0] for x in range(coil_count)], dtype="f8")
+    coil_heights = np.array([1 for x in range(coil_count)], dtype="f8")
+    coil_radius = np.array([1 for x in range(coil_count)], dtype="f8")
 
-print(fluxes)
-print(elapsed)
+    start = time()
+    fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_fronts, coil_rights, coil_heights, coil_radius, 1.)
+    elapsed = time() - start
 
-import matplotlib.pyplot as plot 
+    print(fluxes)
+    print(elapsed)
 
-plot.plot(fluxes)
-plot.show()
+    #import matplotlib.pyplot as plot 
+
+    #plot.plot(fluxes)
+    #plot.show()
+
+if __name__ == "__main__":
+    main()
