@@ -1,3 +1,4 @@
+# pylint: disable=E1133, W0621
 from typing import List
 from time import time
 from numba import jit, f8, i4, f4, prange
