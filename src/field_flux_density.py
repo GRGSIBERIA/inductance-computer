@@ -1,31 +1,31 @@
 # pylint: disable=W0611, W0106
 import sys
 from typing import List
-from numba import jit, prange, f8, f4, i4
+from numba import jit, njit, prange, f8, f4, i4
 import numpy as np 
 from time import time
 import matplotlib.pyplot as plot
-from wired_flux_density import wired_flux_density_on_coils
+from wired_flux_density import wired_flux_density_on_coils, norm3
 
-@jit(f8(f8[:], f8[:], f8[:]), nogil=True, nopython=True)
+@njit(f8(f8[:], f8[:], f8[:]), nogil=True, fastmath=True)
 def compute_fraction(measure_point: np.ndarray, wire_position: np.ndarray, coil_forward: np.ndarray):
     fracUpV = np.dot(coil_forward, wire_position - measure_point) * coil_forward
-    fracUp = np.linalg.norm(fracUpV)
-    fracDown = np.linalg.norm(wire_position - measure_point)
+    fracUp = norm3(fracUpV)
+    fracDown = norm3(wire_position - measure_point)
     fracDown = fracDown * fracDown * fracDown
 
     if fracDown == 0.0:
         return 0.0
     return fracUp / fracDown
 
-@jit(f8(f8[:], f8[:], i4, f8[:,:]), nogil=True, nopython=True)
+@njit(f8(f8[:], f8[:], i4, f8[:,:]), nogil=True)
 def field_flux_density_inner_product_coil(measure_point: np.ndarray, wire_position: np.ndarray, coil_count: int, coil_forwards: np.ndarray):
     total = 0.
     for ci in range(coil_count):
         total += compute_fraction(measure_point, wire_position, coil_forwards[ci])
     return total
 
-@jit(f8(f8[:], i4, f8[:,:], f8[:], i4, f8[:,:], f8), nogil=True, nopython=True)
+@njit(f8(f8[:], i4, f8[:,:], f8[:], i4, f8[:,:], f8), nogil=True)
 def field_flux_density_inducted_wire(measure_point: np.ndarray, wire_count: int, wire_positions: np.ndarray, wired_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
     total = 0.
     for i in range(wire_count):
@@ -33,11 +33,12 @@ def field_flux_density_inducted_wire(measure_point: np.ndarray, wire_count: int,
         total += result * wired_flux_densities[i] * gamma
     return total
 
+#@njit(f8[:,:,:](f8[:], f8[:], f8[:], i4, f8[:,:], f8[:], i4, f8[:,:], f8), nogil=True, parallel=True)
 def field_flux_density(origin: np.ndarray, field_size: np.ndarray, field_delta: np.ndarray, wire_count: int, wire_positions: np.ndarray, field_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
     numof_size = (field_size / field_delta).astype("i4")
     field_fluxes = np.zeros(numof_size, dtype="f8")
 
-    for x in range(numof_size[0]):
+    for x in prange(numof_size[0]):
         for y in range(numof_size[1]):
             for z in range(numof_size[2]):
                 measure_point = np.array([x, y, z], dtype="f8") * field_delta + origin
@@ -45,13 +46,15 @@ def field_flux_density(origin: np.ndarray, field_size: np.ndarray, field_delta: 
 
     return field_fluxes
 
-@jit(f8[:,:](f8[:], f8[:], f8[:], f8[:], f8[:], i4, f8[:,:], f8[:], i4, f8[:,:], f8), nogil=True, parallel=True)
+@njit(f8[:,:](f8[:], f8[:], f8[:], f8[:], f8[:], i4, f8[:,:], f8[:], i4, f8[:,:], f8), nogil=True, parallel=True)
 def plane_flux_density(origin: np.ndarray, planeX: np.ndarray, planeY: np.ndarray, plane_size: np.ndarray, plane_delta: np.ndarray, wire_count: int, wire_positions: np.ndarray, wired_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
-    numof_size = (plane_size / plane_delta).astype("i4")
-    plane_fluxes = np.zeros(numof_size, dtype="f8")
+    numof_size = plane_size / plane_delta
+    numx = int(numof_size[0])
+    numy = int(numof_size[1])
+    plane_fluxes = np.zeros((numx, numy))
 
-    for x in prange(numof_size[0]):
-        for y in range(numof_size[1]):
+    for x in prange(numx):
+        for y in range(numy):
             measure_point = (planeX * x * plane_delta[0] + planeY * y * plane_delta[0]) + origin
             total = field_flux_density_inducted_wire(measure_point, wire_count, wire_positions, wired_flux_densities, coil_count, coil_forwards, gamma)
             plane_fluxes[y][x] = total

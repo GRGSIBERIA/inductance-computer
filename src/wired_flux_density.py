@@ -1,23 +1,27 @@
 # pylint: disable=E1133, W0621
 from typing import List
 from time import time
-from numba import jit, f8, i4, f4, prange
+from numba import jit, njit, f8, i4, f4, prange
 import numpy as np 
 from scipy.integrate import nquad
 
-@jit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
+@njit(nogil=True, cache=True, fastmath=True)
+def norm3(vec):
+    total = vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]
+    return np.sqrt(total)
+
+@njit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
 def mul_quaternion_R(Qi, Qr, Pi, Pr):
     """クォータニオンの積，実数部を返す"""
-    #return Qr * Pr - np.dot(Qi, Pi)
     return Qr * Pr - (Qi[0] * Pi[0] + Qi[1] * Pi[1] + Qi[2] * Pi[2])
 
-@jit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
+@njit(nogil=True, cache=True, fastmath=True)
 def mul_quaternion_I(Qi, Qr, Pi, Pr):
     """クォータニオンの積，虚数部を返す"""
-    #return Qr * Pi + Pr * Qi + np.cross(Qi, Pi)
-    return Qr * Pi + Pr * Qi + np.array([Qi[1] * Pi[2] - Qi[2] * Pi[1], Qi[2] * Pi[0] - Qi[0] * Pi[2], Qi[0] * Pi[1] - Qi[1] * Pi[0]])
+    array = [Qi[1] * Pi[2] - Qi[2] * Pi[1], Qi[2] * Pi[0] - Qi[0] * Pi[2], Qi[0] * Pi[1] - Qi[1] * Pi[0]]
+    return Qr * Pi + Pr * Qi + np.array(array)
 
-@jit(f8(f8, f8, f8[:], f8[:], f8[:], f8[:], f8), nogil=True, cache=True)
+@jit(f8(f8, f8, f8[:], f8[:], f8[:], f8[:], f8), nogil=True, cache=True, fastmath=True)
 def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, sigma: float):
     # クォータニオンの計算
     cos = np.cos(dt)
@@ -39,11 +43,11 @@ def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: 
     frac_up = dr * sigma
     quat = dr * Bi 
     frac_down_vec = quat + wire_position - coil_position
-    frac_down = np.linalg.norm(frac_down_vec)
+    frac_down = norm3(frac_down_vec)
     frac_down = frac_down * frac_down * frac_down
     return frac_up / frac_down
 
-@jit(f8(f8[:], f8[:], f8[:], f8[:], f8, f8, f4), nogil=True, cache=True)
+@jit(nogil=True, cache=True, fastmath=True)
 def wired_flux_density(wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, coil_height: float, coil_radius: float, sigma: float):
     quadargs1 = (wire_position, coil_position + coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
     quadargs2 = (wire_position, coil_position - coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
@@ -52,7 +56,7 @@ def wired_flux_density(wire_position: np.ndarray, coil_position: np.ndarray, coi
     under = nquad(double_quad, [[0., 2.*np.pi], [0., coil_radius]], args=quadargs2)[0]
     return top - under
 
-@jit(f8[:](i4, f8[:,:], i4, f8[:,:], f8[:,:], f8[:,:], f8[:], f8[:], f4), parallel=True, nogil=True)
+@jit(parallel=True, nogil=True)
 def wired_flux_density_on_coils(wire_count: int, wire_positions: np.ndarray, coil_count: int, coil_positions: np.ndarray, coil_forwards: np.ndarray, coil_rights: np.ndarray, coil_heights: List[float], coil_radius: List[float], sigma: float):
     totals = []
     for wi in prange(wire_count):
@@ -60,7 +64,7 @@ def wired_flux_density_on_coils(wire_count: int, wire_positions: np.ndarray, coi
         for ci in range(coil_count):
             total += wired_flux_density(wire_positions[wi], coil_positions[ci], coil_forwards[ci], coil_rights[ci], coil_heights[ci], coil_radius[ci], sigma)
         totals.append(total)
-    return np.array(totals, dtype="f8")
+    return np.array(totals)
 
 
 def main():
