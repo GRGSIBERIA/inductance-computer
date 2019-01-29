@@ -21,7 +21,7 @@ def mul_quaternion_I(Qi, Qr, Pi, Pr):
     array = [Qi[1] * Pi[2] - Qi[2] * Pi[1], Qi[2] * Pi[0] - Qi[0] * Pi[2], Qi[0] * Pi[1] - Qi[1] * Pi[0]]
     return Qr * Pi + Pr * Qi + np.array(array)
 
-@jit(f8(f8, f8, f8[:], f8[:], f8[:], f8[:], f8), nogil=True, cache=True, fastmath=True)
+@njit(f8(f8, f8, f8[:], f8[:], f8[:], f8[:], f8), nogil=True, cache=True, fastmath=True)
 def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, sigma: float):
     # クォータニオンの計算
     cos = np.cos(dt)
