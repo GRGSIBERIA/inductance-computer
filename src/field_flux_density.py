@@ -3,10 +3,12 @@ from typing import List
 from numba import jit 
 import numpy as np 
 from time import time
+import matplotlib.pyplot as plot
 from wired_flux_density import wired_flux_density_on_coils
 
 def compute_fraction(measure_point: np.ndarray, wire_position: np.ndarray, coil_forward: np.ndarray):
-    fracUp = np.dot(coil_forward, wire_position - measure_point) * coil_forward
+    fracUpV = np.dot(coil_forward, wire_position - measure_point) * coil_forward
+    fracUp = np.linalg.norm(fracUpV)
     fracDown = np.linalg.norm(wire_position - measure_point)
     fracDown = fracDown * fracDown * fracDown
     return fracUp / fracDown
@@ -17,11 +19,11 @@ def field_flux_density_inner_product_coil(measure_point: np.ndarray, wire_positi
         total += compute_fraction(measure_point, wire_position, coil_forwards[ci])
     return total
 
-def field_flux_density_inducted_wire(measure_point: np.ndarray, wire_count: int, wire_positions: np.ndarray, field_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
+def field_flux_density_inducted_wire(measure_point: np.ndarray, wire_count: int, wire_positions: np.ndarray, wired_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
     total = 0.
     for i in range(wire_count):
         result = field_flux_density_inner_product_coil(measure_point, wire_positions[i], coil_count, coil_forwards)
-        total += result * field_flux_densities[i] * gamma
+        total += result * wired_flux_densities[i] * gamma
     return total
 
 def field_flux_density(origin: np.ndarray, field_size: np.ndarray, field_delta: np.ndarray, wire_count: int, wire_positions: np.ndarray, field_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
@@ -36,14 +38,15 @@ def field_flux_density(origin: np.ndarray, field_size: np.ndarray, field_delta: 
 
     return field_fluxes
 
-def plane_flux_density(origin: np.ndarray, planeX: np.ndarray, planeY: np.ndarray, plane_size: np.ndarray, plane_delta: np.ndarray, wire_count: int, wire_positions: np.ndarray, field_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
+def plane_flux_density(origin: np.ndarray, planeX: np.ndarray, planeY: np.ndarray, plane_size: np.ndarray, plane_delta: np.ndarray, wire_count: int, wire_positions: np.ndarray, wired_flux_densities: np.ndarray, coil_count: int, coil_forwards: np.ndarray, gamma: float):
     numof_size = (plane_size / plane_delta).astype("i4")
     plane_fluxes = np.zeros(numof_size, dtype="f8")
 
     for x in range(numof_size[0]):
         for y in range(numof_size[1]):
-            measure_point = (planeX * x + planeY * y) * plane_delta + origin
-            plane_fluxes[x][y] = field_flux_density_inducted_wire(measure_point, wire_count, wire_positions, field_flux_densities, coil_count, coil_forwards, gamma)
+            measure_point = (planeX * x * plane_delta[0] + planeY * y * plane_delta[0]) + origin
+            total = field_flux_density_inducted_wire(measure_point, wire_count, wire_positions, wired_flux_densities, coil_count, coil_forwards, gamma)
+            plane_fluxes[y][x] = total
     
     return plane_fluxes
 
@@ -54,17 +57,33 @@ def main():
 
     coil_count = 2
     coil_positions = np.array([[0, -3, 0], [0, 3, 0]], dtype="f8")
-    coil_fronts = np.array([[0, 0, 1] for x in range(coil_count)], dtype="f8")
+    coil_forwards = np.array([[0, 0, 1] for x in range(coil_count)], dtype="f8")
     coil_rights = np.array([[1, 0, 0] for x in range(coil_count)], dtype="f8")
     coil_heights = np.array([1 for x in range(coil_count)], dtype="f8")
     coil_radius = np.array([1 for x in range(coil_count)], dtype="f8")
 
+    origin = np.array([0., -25., 0.], dtype="f8")
+    xvec = np.array([1., 0., 0.], dtype="f8")
+    yvec = np.array([0., 0., 1.], dtype="f8")
+    size = np.array([50., 50.], dtype="f8")
+    delta = np.array([0.5, 0.5], dtype="f8")
+
+    fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_forwards, coil_rights, coil_heights, coil_radius, 1.)
+    print("--- start measurement ---")
+
     start = time()
-    fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_fronts, coil_rights, coil_heights, coil_radius, 1.)
+    heatmap = plane_flux_density(origin, xvec, yvec, size, delta, wire_count, wire_positions, fluxes, coil_count, coil_forwards, 1.)
     elapsed = time() - start
 
-    print(fluxes)
     print(elapsed)
+
+    x = np.arange(0, 50, 0.5)
+    y = np.arange(-25, 25, 0.5)
+    plot.imshow(heatmap, interpolation="nearest", vmin=np.min(heatmap), vmax=np.max(heatmap), cmap="jet")
+    plot.xticks(x)
+    plot.yticks(y)
+    plot.colorbar()
+    plot.show()
 
 if __name__ == "__main__":
     main()

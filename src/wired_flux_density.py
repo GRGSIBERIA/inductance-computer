@@ -43,7 +43,7 @@ def double_quad(dr: float, dt: float, wire_position: np.ndarray, coil_position: 
     frac_down = frac_down * frac_down * frac_down
     return frac_up / frac_down
 
-@jit(f8(f8[:], f8[:], f8[:], f8[:], f8, f8, f4), nogil=True)
+@jit(f8(f8[:], f8[:], f8[:], f8[:], f8, f8, f4), nogil=True, cache=True)
 def wired_flux_density(wire_position: np.ndarray, coil_position: np.ndarray, coil_forward: np.ndarray, coil_right: np.ndarray, coil_height: float, coil_radius: float, sigma: float):
     quadargs1 = (wire_position, coil_position + coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
     quadargs2 = (wire_position, coil_position - coil_forward * coil_height * 0.5, coil_forward, coil_right, sigma)
