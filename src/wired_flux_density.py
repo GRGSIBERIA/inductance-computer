@@ -85,10 +85,10 @@ def main():
     print(fluxes)
     print(elapsed)
 
-    #import matplotlib.pyplot as plot 
+    import matplotlib.pyplot as plot 
 
-    #plot.plot(fluxes)
-    #plot.show()
+    plot.plot(fluxes)
+    plot.show()
 
 if __name__ == "__main__":
     main()

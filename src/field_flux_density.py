@@ -74,11 +74,11 @@ def main():
     coil_heights = np.array([1 for x in range(coil_count)], dtype="f8")
     coil_radius = np.array([1 for x in range(coil_count)], dtype="f8")
 
-    origin = np.array([-25., 0., -25.], dtype="f8")
-    xvec = np.array([1., 0., 0.], dtype="f8")
+    origin = np.array([0., -5., 0.], dtype="f8")
+    xvec = np.array([0., 1., 0.], dtype="f8")
     yvec = np.array([0., 0., 1.], dtype="f8")
-    size = np.array([50., 50.], dtype="f8")
-    delta = np.array([0.5, 0.5], dtype="f8")
+    size = np.array([10., 10.], dtype="f8")
+    delta = np.array([0.05, 0.05], dtype="f8")
 
     fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_forwards, coil_rights, coil_heights, coil_radius, 1.)
     print("--- start measurement ---")
@@ -97,3 +97,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
