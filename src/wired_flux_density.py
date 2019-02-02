@@ -10,7 +10,7 @@ def norm3(vec):
     total = vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]
     return np.sqrt(total)
 
-@njit(f8(f8[:], f8, f8[:], f8), nogil=True, cache=True)
+@njit(nogil=True, cache=True)
 def mul_quaternion_R(Qi, Qr, Pi, Pr):
     """クォータニオンの積，実数部を返す"""
     return Qr * Pr - (Qi[0] * Pi[0] + Qi[1] * Pi[1] + Qi[2] * Pi[2])
