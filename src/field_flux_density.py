@@ -78,7 +78,7 @@ def main():
     xvec = np.array([0., 1., 0.], dtype="f8")
     yvec = np.array([0., 0., 1.], dtype="f8")
     size = np.array([10., 10.], dtype="f8")
-    delta = np.array([0.05, 0.05], dtype="f8")
+    delta = np.array([0.1, 0.1], dtype="f8")
 
     fluxes = wired_flux_density_on_coils(wire_count, wire_positions, coil_count, coil_positions, coil_forwards, coil_rights, coil_heights, coil_radius, 1.)
     print("--- start measurement ---")
